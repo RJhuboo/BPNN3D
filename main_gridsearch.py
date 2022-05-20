@@ -92,13 +92,13 @@ class NeuralNet(nn.Module):
         x = self.fc4(x)
         return x
 class ConvNet(nn.Module):
-    def __init__(self,activation, features,out_channels,n1=240,n2=120,n3=60,k1=3,k2=3,k3=3):
+    def __init__(self,activation, features,out_channels,n1=240,n2=120,n3=60,k1=(3,3,3),k2=(3,3,3),k3=(3,3,3)):
         super(ConvNet,self).__init__()
         # initialize CNN layers 
-        self.conv1 = nn.Conv2d(1,features,kernel_size = k1,stride = 1, padding = 1)
-        self.conv2 = nn.Conv2d(features,features*2, kernel_size = k2, stride = 1, padding = 1)
-        self.conv3 = nn.Conv2d(features*2,64, kernel_size = k3, stride = 1, padding = 1)
-        self.pool = nn.MaxPool2d(2,2)
+        self.conv1 = nn.Conv3d(1,features,kernel_size = k1,stride = (1,1,1), padding = 1)
+        self.conv2 = nn.Conv3d(features,features*2, kernel_size = k2, stride = (1,1,1), padding = 1)
+        self.conv3 = nn.Conv3d(features*2,64, kernel_size = k3, stride = (1,1,1), padding = 1)
+        self.pool = nn.MaxPool3d((2,2,2))
         self.activation = activation
         # initialize NN layers
         self.neural = NeuralNet(activation,n1,n2,n3,out_channels)
