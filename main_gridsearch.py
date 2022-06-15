@@ -39,21 +39,19 @@ def normalization(csv_file,mode,indices):
     return scaler
 
 class Datasets(Dataset):
-    def __init__(self, csv_file, image_dir, opt, indices,transform=None):
-        self.opt = opt
+    def __init__(self, csv_file, image_dir,transform=None):
         self.image_dir = image_dir
         self.labels = pd.read_csv(csv_file)
         self.transform = transform
         self.indices = indices
+        self.opt = opt
+
     def __len__(self):
         return len(self.labels)
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         img_name = os.path.join(self.image_dir, str(self.labels.iloc[idx,0]))
-        image = io.imread(img_name) # Loading Image
-        image = image / 255.0 # Normalizing [0;1]
-        image = image.astype('float32') # Converting images to float32
         if self.opt['norm_method']== "L2":
             lab = preprocessing.normalize(self.labels.iloc[:,1:],axis=0)
         elif self.opt['norm_method'] == "L1":
@@ -69,12 +67,13 @@ class Datasets(Dataset):
         lab = pd.DataFrame(lab)
         lab.insert(0,"File name", self.labels.iloc[:,0], True)
         lab.columns = self.labels.columns
-        labels = lab.iloc[idx,1:] # Takes all corresponding labels
+        labels = self.labels.iloc[idx,1:] # Takes all corresponding labels
         labels = np.array([labels]) 
         labels = labels.astype('float32')
+        image = tio.Subject(ct=tio.ScalarImage(img_name+".nii.gz")) # Loading Image
         if self.transform:
-            sample = self.transform(sample)
-        return {'image': image, 'label': labels}
+            image = self.transform(image)
+        return {"image":image['ct'][tio.DATA], "label":labels}
     
 class NeuralNet(nn.Module):
     def __init__(self,activation,n1,n2,n3,out_channels):
