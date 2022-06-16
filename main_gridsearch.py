@@ -22,9 +22,8 @@ import optuna
 import joblib
 from math import isnan
 import time
-NB_DATA = 4474
+NB_DATA = 24
 NB_LABEL = 6
-PERCENTAGE_TEST = 20
 RESIZE_IMAGE = 512
 
 study = optuna.create_study(sampler=optuna.samplers.TPESampler(), direction='minimize')
@@ -239,24 +238,37 @@ def objective(trial):
            'activation' : trial.suggest_categorical("activation", [F.relu]),                                         
           }
     
-    mse_total = np.zeros(opt['nb_epochs'])
-    mse_train = []
-    # defining data
-    mse_train = []
-    index = range(NB_DATA)
-    split = train_test_split(index,test_size = 0.2,random_state=1)
+    # Create Augmented Dataset
+    datasets_1 = Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA)) # Create dataset
+    transforms_dict = {
+        tio.RandomAffine(scales = 0,
+        degrees=(45,10,10),
+        translation=(0,500,500)),
+        }  
+    datasets_2 = Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
+    transforms_dict = {
+        tio.RandomAffine(scales = 0,
+        degrees=(90,0,0),
+        translation=(0,500,500)),
+        }  
+    datasets_3 = Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
+    datasets = torch.utils.data.ConcatDataset([datasets_1, datasets_2, datasets_3])
+    
+    # Splitting
     kf = KFold(n_splits = opt['k_fold'], shuffle=True)
-    kf.get_n_splits(split[0])
+    kf.get_n_splits(range(len(datasets)))
     print("start training")
     mse_total = np.zeros(opt['nb_epochs'])
-
-    for train_index, test_index in kf.split(split[0]):
+    mse_train = []
+    
+    # Normalization Scaler
+    if opt['norm_method'] == "standardization" or opt['norm_method'] == "minmax":
+        scaler = normalization(opt['label_dir'],opt['norm_method'],train_index)
+    else:
+        scaler = None
+    
+    for train_index, test_index in kf.split(range(len(datasets))):
         mse_test = []
-        if opt['norm_method'] == "standardization" or opt['norm_method'] == "minmax":
-            scaler = normalization(opt['label_dir'],opt['norm_method'],train_index)
-        else:
-            scaler = None
-        datasets = Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = train_index) # Create dataset
         trainloader = DataLoader(datasets, batch_size = opt['batch_size'], sampler = train_index, num_workers = opt['nb_workers'])
         testloader =DataLoader(datasets, batch_size = 1, sampler = test_index, num_workers = opt['nb_workers'])
         model = ConvNet(activation = opt['activation'],features =opt['nof'],out_channels=NB_LABEL,n1=opt['n1'],n2=opt['n2'],n3=opt['n3'],k1 = 3,k2 = 3,k3= 3).to(device)
