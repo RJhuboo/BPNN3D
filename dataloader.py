@@ -33,15 +33,15 @@ class Datasets(Dataset):
         image = io.imread(img_name) # Loading Image
         image = image / 255.0 # Normalizing [0;1]
         image = image.astype('float32') # Converting images to float32
-        if self.opt.norm_method== "L2":
+        if self.opt["norm_method"]== "L2":
             lab = preprocessing.normalize(self.labels.iloc[:,1:],axis=0)
-        elif self.opt.norm_method == "L1":
+        elif self.opt["norm_method"] == "L1":
             lab = preprocessing.normalize(self.labels.iloc[:,1:],norm='l1',axis=0)
-        elif self.opt.norm_method == "minmax":
+        elif self.opt["norm_method"] == "minmax":
             scaler = preprocessing.MinMaxScaler()
             scaler.fit(self.labels.iloc[self.indices,1:])
             lab = scaler.transform(self.labels.iloc[:,1:])
-        elif self.opt.norm_method == "standardization":
+        elif self.opt["norm_method"] == "standardization":
             scaler = preprocessing.StandardScaler()
             scaler.fit(self.labels.iloc[self.indices,1:])
             lab = scaler.transform(self.labels.iloc[:,1:])
