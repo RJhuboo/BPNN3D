@@ -217,7 +217,7 @@ def objective(trial):
             break
     # Create the folder where to save results and checkpoints
     opt = {'label_dir' : "./Label_5p.csv",
-           'image_dir' : "./data/ROI_trab",
+           'image_dir' : "./data/3D_image_Centered_Reduced_ROI_Trab/Train",
            'train_cross' : "./cross_output.pkl",
            'batch_size' : trial.suggest_int('batch_size',8,24,step=8),
            'model' : "ConvNet",
