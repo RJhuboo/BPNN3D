@@ -130,8 +130,7 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
     mse_score = 0.0
 
     for i, data in enumerate(trainloader):
-        inputs, labels = data['image'], data['label']
-        print("inputs shape :", inputs.size())
+        inputs, labels = data['image'].float(), data['label'].float()
         # reshape
         #inputs = inputs.reshape(inputs.size(0),1,RESIZE_IMAGE,RESIZE_IMAGE)
         #labels = labels.reshape(labels.size(0),NB_LABEL)
@@ -185,10 +184,10 @@ def test(model,testloader,epoch,opt):
     # Testing
     with torch.no_grad():
         for i, data in enumerate(testloader):
-            inputs, labels = data['image'],data['label']
+            inputs, labels = data['image'].float(),data['label'].float()
             # reshape
-            inputs = inputs.reshape(1,1,RESIZE_IMAGE,RESIZE_IMAGE)
-            labels = labels.reshape(1,NB_LABEL)
+            #inputs = inputs.reshape(1,1,RESIZE_IMAGE,RESIZE_IMAGE)
+            #labels = labels.reshape(1,NB_LABEL)
             inputs, labels = inputs.to(device),labels.to(device)
             # loss
             outputs = model(inputs)
