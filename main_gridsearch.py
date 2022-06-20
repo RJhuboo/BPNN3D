@@ -264,7 +264,7 @@ def objective(trial):
     
     # Normalization Scaler
     if opt['norm_method'] == "standardization" or opt['norm_method'] == "minmax":
-        scaler = normalization(opt['label_dir'],opt['norm_method'],train_index)
+        scaler = normalization(opt['label_dir'],opt['norm_method'],range(NB_DATA))
     else:
         scaler = None
     
