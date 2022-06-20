@@ -129,7 +129,7 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
     r2_s = 0
     mse_score = 0.0
 
-    for i, data in enumerate(trainloader,0):
+    for i, data in enumerate(trainloader):
         inputs, labels = data['image'], data['label']
         # reshape
         #inputs = inputs.reshape(inputs.size(0),1,RESIZE_IMAGE,RESIZE_IMAGE)
