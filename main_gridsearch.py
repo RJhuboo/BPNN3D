@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 from sklearn.model_selection import KFold
 import random
 import pickle
+import torchio as tio
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
