@@ -78,7 +78,7 @@ class Datasets(Dataset):
 class NeuralNet(nn.Module):
     def __init__(self,activation,n1,n2,n3,out_channels):
         super().__init__()
-        self.fc1 = nn.Linear(64*64*64,n1)
+        self.fc1 = nn.Linear(64*64*36,n1)
         self.fc2 = nn.Linear(n1,n2)
         self.fc3 = nn.Linear(n2,n3)
         self.fc4 = nn.Linear(n3,out_channels)
