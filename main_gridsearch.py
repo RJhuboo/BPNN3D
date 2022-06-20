@@ -132,8 +132,8 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
     for i, data in enumerate(trainloader,0):
         inputs, labels = data['image'], data['label']
         # reshape
-        inputs = inputs.reshape(inputs.size(0),1,RESIZE_IMAGE,RESIZE_IMAGE)
-        labels = labels.reshape(labels.size(0),NB_LABEL)
+        #inputs = inputs.reshape(inputs.size(0),1,RESIZE_IMAGE,RESIZE_IMAGE)
+        #labels = labels.reshape(labels.size(0),NB_LABEL)
         inputs, labels = inputs.to(device), labels.to(device)
         # zero the parameter gradients
         optimizer.zero_grad()
