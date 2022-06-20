@@ -131,7 +131,7 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
 
     for i, data in enumerate(trainloader):
         inputs, labels = data['image'], data['label']
-        print("inputs shape :", inputs.shape())
+        print("inputs shape :", inputs.size())
         # reshape
         #inputs = inputs.reshape(inputs.size(0),1,RESIZE_IMAGE,RESIZE_IMAGE)
         #labels = labels.reshape(labels.size(0),NB_LABEL)
