@@ -38,7 +38,7 @@ def normalization(csv_file,mode,indices):
     return scaler
 
 class Datasets(Dataset):
-    def __init__(self, csv_file, image_dir,transform=None):
+    def __init__(self,opt, csv_file, image_dir,transform=None):
         self.image_dir = image_dir
         self.labels = pd.read_csv(csv_file)
         self.transform = transform
