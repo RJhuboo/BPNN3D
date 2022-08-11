@@ -108,6 +108,7 @@ class ConvNet(nn.Module):
         x = self.pool(self.activation(self.conv1(x)))
         x = self.pool(self.activation(self.conv2(x)))
         x = self.pool(self.activation(self.conv3(x)))
+        print(x.size())
         x = self.neural(x)
         return x
     
