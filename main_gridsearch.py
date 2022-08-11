@@ -141,6 +141,8 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
         optimizer.zero_grad()
         # forward backward and optimization
         outputs = model(inputs)
+        print(outputs.size())
+        print(labels.size())
         Loss = MSELoss()
         loss = Loss(outputs,labels)
         if isnan(loss) == True:
