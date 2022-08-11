@@ -142,6 +142,8 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
         optimizer.zero_grad()
         # forward backward and optimization
         outputs = model(inputs)
+        print(outputs)
+        print(labels)
         print(outputs.size())
         print(labels.size())
         Loss = MSELoss()
