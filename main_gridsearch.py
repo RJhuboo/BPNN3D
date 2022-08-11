@@ -73,7 +73,7 @@ class Datasets(Dataset):
         image = tio.Subject(ct=tio.ScalarImage(img_name+".nii.gz")) # Loading Image
         if self.transform:
             image = self.transform(image)
-        im = image['ct'][tio.DATA].clont().detach()
+        im = image['ct'][tio.DATA].clone().detach()
         im = torch.tensor(im,dtype=torch.float32)
         return {"image":image['ct'][tio.DATA], "label":labels}
     
