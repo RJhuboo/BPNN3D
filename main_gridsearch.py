@@ -74,7 +74,8 @@ class Datasets(Dataset):
         if self.transform:
             image = self.transform(image)
         im = image['ct'][tio.DATA]
-        im= torch.tensor(im,dtype=torch.float32)
+        im=  im.clone().detach()
+        im = torch.tensor(im,dtype=torch.float32)
         return {"image":image['ct'][tio.DATA], "label":labels}
     
 class NeuralNet(nn.Module):
