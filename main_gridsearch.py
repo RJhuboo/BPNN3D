@@ -75,7 +75,7 @@ class Datasets(Dataset):
             image = self.transform(image)
         im = image['ct'][tio.DATA].clone().detach()
         im = torch.tensor(im,dtype=torch.float32)
-        return {"image":image['ct'][tio.DATA], "label":labels}
+        return {"image":im, "label":labels}
     
 class NeuralNet(nn.Module):
     def __init__(self,activation,n1,n2,n3,out_channels):
@@ -227,7 +227,7 @@ def objective(trial):
            'batch_size' : trial.suggest_int('batch_size',2,6,step=2),
            'model' : "ConvNet",
            'nof' : trial.suggest_int('nof',8,100),
-           'lr': 1e-4,
+           'lr': 1e-6,
            'nb_epochs' : 80,
            'checkpoint_path' : "./",
            'mode': "Train",
