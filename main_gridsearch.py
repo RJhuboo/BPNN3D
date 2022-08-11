@@ -25,7 +25,7 @@ from math import isnan
 import time
 NB_DATA = 24
 NB_LABEL = 6
-RESIZE_IMAGE = 512
+RESIZE_IMAGE = 288
 
 study = optuna.create_study(sampler=optuna.samplers.TPESampler(), direction='minimize')
 
@@ -80,7 +80,7 @@ class Datasets(Dataset):
 class NeuralNet(nn.Module):
     def __init__(self,activation,n1,n2,n3,out_channels):
         super().__init__()
-        self.fc1 = nn.Linear(64*64*36,n1)
+        self.fc1 = nn.Linear(36*36*36,n1)
         self.fc2 = nn.Linear(n1,n2)
         self.fc3 = nn.Linear(n2,n3)
         self.fc4 = nn.Linear(n3,out_channels)
@@ -98,7 +98,7 @@ class ConvNet(nn.Module):
         # initialize CNN layers 
         self.conv1 = nn.Conv3d(1,features,kernel_size = k1,stride = (1,1,1), padding = 1)
         self.conv2 = nn.Conv3d(features,features*2, kernel_size = k2, stride = (1,1,1), padding = 1)
-        self.conv3 = nn.Conv3d(features*2,32, kernel_size = k3, stride = (1,1,1), padding = 1)
+        self.conv3 = nn.Conv3d(features*2,36, kernel_size = k3, stride = (1,1,1), padding = 1)
         self.pool = nn.MaxPool3d((2,2,2))
         self.activation = activation
         # initialize NN layers
