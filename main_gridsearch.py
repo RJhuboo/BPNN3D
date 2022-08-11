@@ -73,6 +73,8 @@ class Datasets(Dataset):
         image = tio.Subject(ct=tio.ScalarImage(img_name+".nii.gz")) # Loading Image
         if self.transform:
             image = self.transform(image)
+        im = image['ct'][tio.DATA]
+        im = torch.tensor(im,dtype=torch.float32)
         return {"image":image['ct'][tio.DATA], "label":labels}
     
 class NeuralNet(nn.Module):
@@ -220,7 +222,7 @@ def objective(trial):
     opt = {'label_dir' : "./trab3d_11p.csv",
            'image_dir' : "./data/3D_image_Centered_Reduced_ROI_Trab/Train",
            'train_cross' : "./cross_output.pkl",
-           'batch_size' : trial.suggest_int('batch_size',8,16,step=8),
+           'batch_size' : trial.suggest_int('batch_size',2,6,step=8),
            'model' : "ConvNet",
            'nof' : trial.suggest_int('nof',8,100),
            'lr': trial.suggest_loguniform('lr',1e-4,1e-2),
