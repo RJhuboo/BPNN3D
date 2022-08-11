@@ -87,7 +87,6 @@ class NeuralNet(nn.Module):
         self.activation = activation
     def forward(self,x):
         x = torch.flatten(x,1)
-        print(x.size())
         x = self.activation(self.fc1(x))
         x = self.activation(self.fc2(x))
         x = self.activation(self.fc3(x))
@@ -109,7 +108,6 @@ class ConvNet(nn.Module):
         x = self.pool(self.activation(self.conv1(x)))
         x = self.pool(self.activation(self.conv2(x)))
         x = self.pool(self.activation(self.conv3(x)))
-        print(x.size())
         x = self.neural(x)
         return x
     
