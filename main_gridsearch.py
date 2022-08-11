@@ -24,7 +24,7 @@ import joblib
 from math import isnan
 import time
 NB_DATA = 24
-NB_LABEL = 6
+NB_LABEL = 11
 RESIZE_IMAGE = 288
 
 study = optuna.create_study(sampler=optuna.samplers.TPESampler(), direction='minimize')
