@@ -227,7 +227,7 @@ def objective(trial):
            'batch_size' : trial.suggest_int('batch_size',2,6,step=2),
            'model' : "ConvNet",
            'nof' : trial.suggest_int('nof',8,100),
-           'lr': 1e-6,
+           'lr': 1e-10,
            'nb_epochs' : 80,
            'checkpoint_path' : "./",
            'mode': "Train",
