@@ -77,7 +77,6 @@ class Datasets(Dataset):
             image = self.transform(image)
         im = image['ct'][tio.DATA]
         im.to(torch.float32)
-        print("old labels", labels)
         return {"image":im, "label":labels}
     
 class NeuralNet(nn.Module):
@@ -136,8 +135,6 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
 
     for i, data in enumerate(trainloader):
         inputs, labels = data['image'].float(), data['label'].float()
-        print("new labels")
-        print(labels)
         # reshape
         #inputs = inputs.reshape(inputs.size(0),1,RESIZE_IMAGE,RESIZE_IMAGE)
         labels = labels.reshape(labels.size(0),NB_LABEL)
@@ -148,8 +145,6 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
         outputs = model(inputs)
         print(outputs)
         print(labels)
-        print(outputs.size())
-        print(labels.size())
         Loss = MSELoss()
         loss = Loss(outputs,labels)
         if isnan(loss) == True:
