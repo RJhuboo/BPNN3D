@@ -57,11 +57,9 @@ class Datasets(Dataset):
         elif self.opt['norm_method'] == "L1":
             lab = preprocessing.normalize(self.labels.iloc[:,1:],norm='l1',axis=0)
         elif self.opt['norm_method'] == "minmax":
-            print("create scaler")
             scaler = preprocessing.MinMaxScaler()
             scaler.fit(self.labels.iloc[self.indices,1:])
             lab = scaler.transform(self.labels.iloc[:,1:])
-            print
         elif self.opt['norm_method'] == "standardization":
             scaler = preprocessing.StandardScaler()
             scaler.fit(self.labels.iloc[self.indices,1:])
@@ -226,11 +224,10 @@ def objective(trial):
     opt = {'label_dir' : "./trab3d_11p.csv",
            'image_dir' : "./data/3D_image_Centered_Reduced_ROI_Trab/Train",
            'train_cross' : "./cross_output.pkl",
-           #'batch_size' : trial.suggest_int('batch_size',1,4,step=1),
-           'batch_size':1,
+           'batch_size' : trial.suggest_int('batch_size',1,4,step=1),
            'model' : "ConvNet",
-           'nof' : trial.suggest_int('nof',8,100),
-           'lr': 1e-4,
+           'nof' : trial.suggest_int('nof',8,50),
+           'lr': trial.suggest_loguniform('lr',1e-5,1e-1),
            'nb_epochs' : 80,
            'checkpoint_path' : "./",
            'mode': "Train",
