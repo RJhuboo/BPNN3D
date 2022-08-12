@@ -143,7 +143,7 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
         outputs = model(inputs)
         Loss = MSELoss()
         loss = Loss(outputs,labels)
-        if isnan(loss) == True:*
+        if isnan(loss) == True:
             print("there is nan is the loss !")
             print(outputs)
             print(labels)
