@@ -23,7 +23,7 @@ import optuna
 import joblib
 from math import isnan
 import time
-NB_DATA = 24
+NB_DATA = 30
 NB_LABEL = 11
 RESIZE_IMAGE = 288
 
@@ -74,7 +74,7 @@ class Datasets(Dataset):
         if self.transform:
             image = self.transform(image)
         im = image['ct'][tio.DATA]
-        im.to(torch.float32)
+        im.type(torch.FloatTensor)
         print(im.type())
         return {"image":im, "label":labels}
     
