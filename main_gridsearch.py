@@ -75,6 +75,7 @@ class Datasets(Dataset):
             image = self.transform(image)
         im = image['ct'][tio.DATA]
         im.to(torch.float32)
+        print(im.type())
         return {"image":im, "label":labels}
     
 class NeuralNet(nn.Module):
