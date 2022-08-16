@@ -74,7 +74,7 @@ class Datasets(Dataset):
         if self.transform:
             image = self.transform(image)
         im = image['ct'][tio.DATA]
-        im.type(torch.FloatTensor)
+        im = im.type(torch.FloatTensor)
         print(im.type())
         return {"image":im, "label":labels}
     
