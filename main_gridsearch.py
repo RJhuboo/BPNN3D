@@ -188,7 +188,7 @@ def test(model,testloader,epoch,opt):
     # Testing
     with torch.no_grad():
         for i, data in enumerate(testloader):
-            inputs, labels = data['image'].float(),data['label'].float()
+            inputs, labels = data['image'],data['label']
             # reshape
             #inputs = inputs.reshape(1,1,RESIZE_IMAGE,RESIZE_IMAGE)
             #labels = labels.reshape(1,NB_LABEL)
@@ -240,9 +240,15 @@ def objective(trial):
            #'norm_method': trial.suggest_categorical('norm_method',["standardization","minmax"]),
            'norm_method': "minmax",
            'optimizer' :  trial.suggest_categorical("optimizer",[Adam, SGD]),
-           'activation' : trial.suggest_categorical("activation", [F.relu]),                                         
+           'activation' : trial.suggest_categorical("activation", [F.relu]),
+           'gpu_ids' : [0,1,2]
           }
-    print("number of batch:", opt['batch_size']) 
+
+    if torch.cuda.device_count() > 1:
+        print("Let's use", torch.cuda.device_count())
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    else:
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
     # Create Augmented Dataset
     datasets_1 = Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA)) # Create dataset
