@@ -242,7 +242,7 @@ def objective(trial):
            'optimizer' :  trial.suggest_categorical("optimizer",[Adam, SGD]),
            'activation' : trial.suggest_categorical("activation", [F.relu]),                                         
           }
-    print("number of batch:", opt.['batch_size']) 
+    print("number of batch:", opt['batch_size']) 
     
     # Create Augmented Dataset
     datasets_1 = Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA)) # Create dataset
