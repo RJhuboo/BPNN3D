@@ -23,7 +23,7 @@ import optuna
 import joblib
 from math import isnan
 import time
-NB_DATA = 30
+NB_DATA = 27
 NB_LABEL = 11
 RESIZE_IMAGE = 288
 
