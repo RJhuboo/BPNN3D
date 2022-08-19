@@ -224,18 +224,18 @@ def objective(trial):
     opt = {'label_dir' : "./trab3d_11p.csv",
            'image_dir' : "./data/3D_image_Centered_Reduced_ROI_Trab/Train",
            'train_cross' : "./cross_output.pkl",
-           'batch_size' : trial.suggest_int('batch_size',1,4,step=1),
+           'batch_size' : trial.suggest_int('batch_size',1,2,step=1),
            'model' : "ConvNet",
-           'nof' : trial.suggest_int('nof',8,50),
+           'nof' : trial.suggest_int('nof',10,50),
            'lr': trial.suggest_loguniform('lr',1e-5,1e-1),
            'nb_epochs' : 80,
            'checkpoint_path' : "./",
            'mode': "Train",
            'cross_val' : False,
-           'k_fold' : 3,
-           'n1' : trial.suggest_int('n1', 36,120),
-           'n2' : trial.suggest_int('n2',36,120),
-           'n3' : trial.suggest_int('n3',64,120),
+           'k_fold' : 4,
+           'n1' : trial.suggest_int('n1', 80,180),
+           'n2' : trial.suggest_int('n2',80,1800),
+           'n3' : trial.suggest_int('n3',80,1800),
            'nb_workers' : 8,
            #'norm_method': trial.suggest_categorical('norm_method',["standardization","minmax"]),
            'norm_method': "minmax",
@@ -250,6 +250,7 @@ def objective(trial):
     else:
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
+    print(opt["batch_size"])
     # Create Augmented Dataset
     datasets_1 = Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA)) # Create dataset
     transforms_dict = {
@@ -272,7 +273,7 @@ def objective(trial):
     print("start training")
     mse_total = np.zeros(opt['nb_epochs'])
     mse_train = []
-    
+    print("number of data :",len(datasets))
     # Normalization Scaler
     if opt['norm_method'] == "standardization" or opt['norm_method'] == "minmax":
         scaler = normalization(opt['label_dir'],opt['norm_method'],range(NB_DATA))
@@ -280,6 +281,8 @@ def objective(trial):
         scaler = None
     
     for train_index, test_index in kf.split(range(len(datasets))):
+        print("trainset :", train_index)
+        print("testset :",test_index)
         mse_test = []
         trainloader = DataLoader(datasets, batch_size = opt['batch_size'], sampler = train_index, num_workers = opt['nb_workers'])
         testloader =DataLoader(datasets, batch_size = 1, sampler = test_index, num_workers = opt['nb_workers'])
