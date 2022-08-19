@@ -232,7 +232,7 @@ def objective(trial):
            'checkpoint_path' : "./",
            'mode': "Train",
            'cross_val' : False,
-           'k_fold' : 4,
+           'k_fold' : 1,
            'n1' : trial.suggest_int('n1', 80,180),
            'n2' : trial.suggest_int('n2',80,1800),
            'n3' : trial.suggest_int('n3',80,1800),
