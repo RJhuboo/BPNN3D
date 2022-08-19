@@ -268,8 +268,11 @@ def objective(trial):
     datasets = torch.utils.data.ConcatDataset([datasets_1, datasets_2, datasets_3])
     
     # Splitting
-    kf = KFold(n_splits = opt['k_fold'], shuffle=True)
-    kf.get_n_splits(range(len(datasets)))
+    if opt['k_fold'] >1:
+        kf = KFold(n_splits = opt['k_fold'], shuffle=True)
+        kf.get_n_splits(range(len(datasets)))
+    else:
+        kf = train_test_split(index,test_size=0.2, random_state=42)
     print("start training")
     mse_total = np.zeros(opt['nb_epochs'])
     mse_train = []
@@ -280,7 +283,10 @@ def objective(trial):
     else:
         scaler = None
     
-    for train_index, test_index in kf.split(range(len(datasets))):
+    #for train_index, test_index in kf.split(range(len(datasets))):
+    for k in range(opt["k_fold"]):
+        train_index = kf[0]
+        test_index = kf[1]
         print("trainset :", train_index)
         print("testset :",test_index)
         mse_test = []
