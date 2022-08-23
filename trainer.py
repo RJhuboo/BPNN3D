@@ -40,7 +40,6 @@ class Trainer():
             inputs, labels = data['image'], data['label']
             
             # reshape
-            inputs = inputs.reshape(inputs.size(0),1,512,512)
             labels = labels.reshape(labels.size(0),self.NB_LABEL)
             inputs, labels = inputs.to(self.device), labels.to(self.device)
             
@@ -49,15 +48,7 @@ class Trainer():
             
             # forward backward and optimization
             outputs = self.model(inputs)
-            if self.opt.model == "MultiNet":
-                loss1 = self.criterion(outputs[0],torch.reshape(labels[:,0],[len(outputs[0]),1]))
-                loss2 = self.criterion(outputs[1],torch.reshape(labels[:,1],[len(outputs[1]),1]))
-                loss3 = self.criterion(outputs[2],torch.reshape(labels[:,2],[len(outputs[2]),1]))
-                loss4 = self.criterion(outputs[3],torch.reshape(labels[:,3],[len(outputs[3]),1]))
-                loss5 = self.criterion(outputs[4],torch.reshape(labels[:,4],[len(outputs[4]),1]))
-                loss = (self.opt.alpha1*loss1) + (self.opt.alpha2*loss2) + (self.opt.alpha3*loss3) + (self.opt.alpha4*loss4) + (self.opt.alpha5*loss5)
-            else:
-                loss = self.criterion(outputs,labels)
+            loss = self.criterion(outputs,labels)
             loss.backward()
             self.optimizer.step()
             
@@ -103,33 +94,21 @@ class Trainer():
             for i, data in enumerate(testloader):
                 inputs, labels, ID = data['image'],data['label'],data['ID']
                 # reshape
-                inputs = inputs.reshape(1,1,512,512)
-                labels = labels.reshape(1,self.NB_LABEL)
                 inputs, labels = inputs.to(self.device),labels.to(self.device)
                 
                 # loss
                 outputs = self.model(inputs)
-                if self.opt.model == "MultiNet":
-                    loss1 = self.criterion(outputs[0],torch.reshape(labels[:,0],[1,1]))
-                    loss2 = self.criterion(outputs[1],torch.reshape(labels[:,1],[1,1]))
-                    loss3 = self.criterion(outputs[2],torch.reshape(labels[:,2],[1,1]))
-                    loss4 = self.criterion(outputs[3],torch.reshape(labels[:,3],[1,1]))
-                    loss5 = self.criterion(outputs[4],torch.reshape(labels[:,4],[1,1]))
-                    loss = (self.opt.alpha1*loss1) + (self.opt.alpha2*loss2) + (self.opt.alpha3*loss3) + (self.opt.alpha4*loss4) + (self.opt.alpha5*loss5)
-                else:
-                    loss = self.criterion(outputs,labels)
+                loss = self.criterion(outputs,labels)
                 test_loss += loss.item()
                 test_total += 1
                 
                 # statistics
-                if self.opt.model == "MultiNet":
-                    labels = labels.cpu().detach().numpy()
-                else:
-                    labels, outputs = labels.cpu().detach().numpy(), outputs.cpu().detach().numpy()
-                labels, outputs = np.array(labels), np.array(outputs)
+                outputs,labels=outputs.reshape(1,self.opt.NB_LABEL), labels.reshape(1,self.opt.NB_LABEL)
+                #labels, outputs = labels.cpu().detach().numpy(), outputs.cpu().detach().numpy()
+                #labels, outputs = np.array(labels), np.array(outputs)
                 #labels, outputs = labels.reshape(self.NB_LABEL,1), outputs.reshape(self.NB_LABEL,1)
-                labels=labels.reshape(1,self.NB_LABEL)
-                outputs=outputs.reshape(1,self.NB_LABEL)
+                #labels=labels.reshape(1,self.NB_LABEL)
+                #outputs=outputs.reshape(1,self.NB_LABEL)
 
                 if self.opt.norm_method == "standardization" or self.opt.norm_method == "minmax":
                     outputs = self.scaler.inverse_transform(outputs)
