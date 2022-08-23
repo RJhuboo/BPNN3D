@@ -216,30 +216,37 @@ def objective(trial):
     i=0
     while True:
         i += 1
-        if os.path.isdir("./result/cross_convnet_minmax"+str(i)) == False:
-            save_folder = "./result/cross_convnet_minmax"+str(i)
+        if os.path.isdir("./result/cross_BPNN3D_theone"+str(i)) == False:
+            save_folder = "./result/cross_BPNN3D_theone"+str(i)
             os.mkdir(save_folder)
             break
     # Create the folder where to save results and checkpoints
     opt = {'label_dir' : "./trab3d_11p.csv",
            'image_dir' : "./data/3D_image_Centered_Reduced_ROI_Trab/Train",
            'train_cross' : "./cross_output.pkl",
-           'batch_size' : trial.suggest_int('batch_size',1,2,step=1),
+           #'batch_size' : trial.suggest_int('batch_size',1,2,step=1),
+           'batch_size':1,
            'model' : "ConvNet",
-           'nof' : trial.suggest_int('nof',10,50),
-           'lr': trial.suggest_loguniform('lr',1e-6,1e-4),
-           'nb_epochs' : 80,
+           #'nof' : trial.suggest_int('nof',10,50),
+           'nof':24,
+           #'lr': trial.suggest_loguniform('lr',1e-6,1e-4),
+           'lr':0.00009,
+           'nb_epochs' : 300,
            'checkpoint_path' : "./",
            'mode': "Train",
            'cross_val' : False,
            'k_fold' : 1,
-           'n1' : trial.suggest_int('n1', 80,180),
-           'n2' : trial.suggest_int('n2',80,1800),
-           'n3' : trial.suggest_int('n3',80,1800),
+           #'n1' : trial.suggest_int('n1', 80,180),
+           #'n2' : trial.suggest_int('n2',80,1800),
+           #'n3' : trial.suggest_int('n3',80,1800),
+           'n1':81,
+           'n2':1798,
+           'n3':748,
            'nb_workers' : 8,
            #'norm_method': trial.suggest_categorical('norm_method',["standardization","minmax"]),
            'norm_method': "minmax",
-           'optimizer' :  trial.suggest_categorical("optimizer",[Adam, SGD]),
+           #'optimizer' :  trial.suggest_categorical("optimizer",[Adam, SGD]),
+           'optimizer':Adam,
            'activation' : trial.suggest_categorical("activation", [F.relu]),
            'gpu_ids' : [0,1,2]
           }
@@ -272,7 +279,7 @@ def objective(trial):
         kf = KFold(n_splits = opt['k_fold'], shuffle=True)
         kf.get_n_splits(range(len(datasets)))
     else:
-        kf = train_test_split(index,test_size=0.2, random_state=42)
+        kf = train_test_split(range(len(datasets)),test_size=0.2, random_state=42)
     print("start training")
     mse_total = np.zeros(opt['nb_epochs'])
     mse_train = []
@@ -317,6 +324,6 @@ else:
     device = "cpu"
     print("running on cpu")
     
-study.optimize(objective,n_trials=15)
-with open("./cross_convnet_minmax.pkl","wb") as f:
+study.optimize(objective,n_trials=1)
+with open("./cross_BPNN3D_thone.pkl","wb") as f:
     pickle.dump(study,f)
