@@ -275,11 +275,11 @@ def objective(trial):
     datasets = torch.utils.data.ConcatDataset([datasets_1, datasets_2, datasets_3])
     
     # Splitting
+    split = train_test_split(range(len(datasets)),test_size=0.2, random_state=42)
     if opt['k_fold'] >1:
         kf = KFold(n_splits = opt['k_fold'], shuffle=True)
-        kf.get_n_splits(range(len(datasets)))
     else:
-        kf = train_test_split(range(len(datasets)),test_size=0.2, random_state=42)
+        kf = train_test_split(split[0],test_size=0.1, random_state=42)
     print("start training")
     mse_total = np.zeros(opt['nb_epochs'])
     mse_train = []
