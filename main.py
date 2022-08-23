@@ -43,7 +43,7 @@ parser.add_argument("--n2", type=int, default = 120, help = "number of neurons i
 parser.add_argument("--n3", type=int, default = 60, help = "number of neurons in the third layer of the neural network")
 parser.add_argument("--nb_workers", type=int, default = 0, help ="number of workers for datasets")
 parser.add_argument("--norm_method", type=str, default = "standardization", help = "choose how to normalize bio parameters")
-parser.add_argument("--NB_LABEL", type=int, default = 6, help = "specify the number of labels")
+parser.add_argument("--NB_LABEL", type=int, default = 11, help = "specify the number of labels")
 parser.add_argument("--alpha1", type=float, default = 1)
 parser.add_argument("--alpha2", type=float, default = 1)
 parser.add_argument("--alpha3", type=float, default = 1)
@@ -51,7 +51,7 @@ parser.add_argument("--alpha4", type=float, default = 1)
 parser.add_argument("--alpha5", type=float, default = 1)
 
 opt = parser.parse_args()
-NB_DATA = 4474
+NB_DATA = 24
 PERCENTAGE_TEST = 20
 SIZE_IMAGE = 512
 NB_LABEL = opt.NB_LABEL
@@ -83,9 +83,22 @@ def train():
     score_mse_t = []
     score_mse_v = []
     # defining data
-    index = range(NB_DATA)
+    datasets_1 = dataloader.Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA)) # Create dataset
+    transforms_dict = {
+        tio.RandomAffine(scales = 0,
+        degrees=(45,10,10),
+        translation=(0,500,500)),
+        }  
+    datasets_2 = dataloader.Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
+    transforms_dict = {
+        tio.RandomAffine(scales = 0,
+        degrees=(90,0,0),
+        translation=(0,500,500)),
+        }  
+    datasets_3 = dataloader.Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
+    datasets = torch.utils.data.ConcatDataset([datasets_1, datasets_2, datasets_3])
+    index = range(len(datasets))
     split = train_test_split(index,test_size = 0.2,random_state=1)
-    datasets = dataloader.Datasets(csv_file = opt.label_dir, image_dir = opt.image_dir, opt=opt, indices = split[0]) # Create dataset
     print("start training")
     trainloader = DataLoader(datasets, batch_size = opt.batch_size, sampler = split[0], num_workers = opt.nb_workers )
     testloader =DataLoader(datasets, batch_size = 1, sampler = split[1], num_workers = opt.nb_workers )
@@ -98,19 +111,6 @@ def train():
     if opt.model == "ConvNet":
         print("## Choose model : convnet ##")
         model = Model.ConvNet(features =opt.nof,out_channels=NB_LABEL,n1=opt.n1,n2=opt.n2,n3=opt.n3,k1 = 3,k2 = 3,k3= 3).to(device)
-    elif opt.model == "resnet50":
-        print("## Choose model : resnet50 ##")
-        model = Model.ResNet50(14,1).to(device)
-    elif opt.model == "restnet101":
-        print("## Choose model : resnet101 ##")
-        model = Model.ResNet101(14,1).to(device)
-    elif opt.model == "Unet":
-        print("## Choose model : Unet ##")
-        model = Model.UNet(in_channels=1,out_channels=1,nb_label=NB_LABEL, n1=opt.n1, n2=opt.n2, n3=opt.n3, init_features=opt.nof).to(device)
-    elif opt.model == "MultiNet":
-        print("## Choose model : MultiNet ##")
-        model = Model.MultiNet(features =opt.nof,out_channels=NB_LABEL,n1=opt.n1,n2=opt.n2,n3=opt.n3,k1 = 3,k2 = 3,k3= 3).to(device)
-    # model.apply(reset_weights)
     torch.manual_seed(5)
 
     # Start training
@@ -139,7 +139,7 @@ else :
             save_folder = "./result/train"+str(i)
             os.mkdir(save_folder)
             break
-            
+    
     model = Model.ConvNet(features =opt.nof,out_channels=NB_LABEL,n1=opt.n1,n2=opt.n2,n3=opt.n3,k1 = 3,k2 = 3,k3= 3).to(device)
     index = range(NB_DATA)
     split = train_test_split(index,test_size = 0.2,random_state=1)
