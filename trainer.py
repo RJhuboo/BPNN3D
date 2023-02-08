@@ -104,7 +104,7 @@ class Trainer():
                 
                 # statistics
                 outputs,labels=outputs.reshape(1,self.opt.NB_LABEL), labels.reshape(1,self.opt.NB_LABEL)
-                #labels, outputs = labels.cpu().detach().numpy(), outputs.cpu().detach().numpy()
+                labels, outputs = labels.cpu().detach().numpy(), outputs.cpu().detach().numpy()
                 #labels, outputs = np.array(labels), np.array(outputs)
                 #labels, outputs = labels.reshape(self.NB_LABEL,1), outputs.reshape(self.NB_LABEL,1)
                 #labels=labels.reshape(1,self.NB_LABEL)
@@ -126,7 +126,7 @@ class Trainer():
         print(' Test_loss: {}'.format(test_loss/test_total))
         return mse
     
-    def inference(infloader,epoch)
+    def inference(infloader,epoch):
        
         output = {}
         IDs = {}

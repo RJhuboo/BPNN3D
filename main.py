@@ -10,7 +10,7 @@ import random
 import pickle
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
-
+import torchio as tio
 from sklearn.model_selection import train_test_split
 import Model
 from trainer import Trainer
@@ -27,8 +27,8 @@ else:
 ''' Options '''
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--label_dir", default = "./Label_5p.csv", help = "path to label csv file")
-parser.add_argument("--image_dir", default = "./data/LR_trab", help = "path to image directory")
+parser.add_argument("--label_dir", default = "./trab3d_11p.csv", help = "path to label csv file")
+parser.add_argument("--image_dir", default = "./data/3D_image_Centered_Reduced_ROI_Trab/Train",help = "path to image directory")
 parser.add_argument("--train_cross", default = "./cross_output.pkl", help = "filename of the output of the cross validation")
 parser.add_argument("--batch_size", type=int, default = 16, help = "number of batch")
 parser.add_argument("--model", default = "MultiNet", help="Choose model : Unet or ConvNet") 
@@ -44,12 +44,6 @@ parser.add_argument("--n3", type=int, default = 60, help = "number of neurons in
 parser.add_argument("--nb_workers", type=int, default = 0, help ="number of workers for datasets")
 parser.add_argument("--norm_method", type=str, default = "standardization", help = "choose how to normalize bio parameters")
 parser.add_argument("--NB_LABEL", type=int, default = 11, help = "specify the number of labels")
-parser.add_argument("--alpha1", type=float, default = 1)
-parser.add_argument("--alpha2", type=float, default = 1)
-parser.add_argument("--alpha3", type=float, default = 1)
-parser.add_argument("--alpha4", type=float, default = 1)
-parser.add_argument("--alpha5", type=float, default = 1)
-
 opt = parser.parse_args()
 NB_DATA = 24
 PERCENTAGE_TEST = 20
@@ -83,19 +77,19 @@ def train():
     score_mse_t = []
     score_mse_v = []
     # defining data
-    datasets_1 = dataloader.Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA)) # Create dataset
+    datasets_1 = dataloader.Datasets(csv_file = opt.label_dir, image_dir = opt.image_dir, opt=opt, indices = range(NB_DATA)) # Create dataset
     transforms_dict = {
         tio.RandomAffine(scales = 0,
         degrees=(45,10,10),
         translation=(0,500,500)),
         }  
-    datasets_2 = dataloader.Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
+    datasets_2 = dataloader.Datasets(csv_file = opt.label_dir, image_dir = opt.image_dir, opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
     transforms_dict = {
         tio.RandomAffine(scales = 0,
         degrees=(90,0,0),
         translation=(0,500,500)),
         }  
-    datasets_3 = dataloader.Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
+    datasets_3 = dataloader.Datasets(csv_file = opt.label_dir, image_dir = opt.image_dir, opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
     datasets = torch.utils.data.ConcatDataset([datasets_1, datasets_2, datasets_3])
     index = range(len(datasets))
     split = train_test_split(index,test_size = 0.2,random_state=1)
@@ -104,7 +98,7 @@ def train():
     testloader =DataLoader(datasets, batch_size = 1, sampler = split[1], num_workers = opt.nb_workers )
 
     if opt.norm_method == "standardization" or opt.norm_method == "minmax":
-        scaler = dataloader.normalization(opt.label_dir,opt.norm_method,split[0])
+        scaler = dataloader.normalization(opt.label_dir,opt.norm_method,range(NB_DATA))
     else:
         scaler = None
     # defining the model
@@ -139,7 +133,7 @@ else :
             save_folder = "./result/train"+str(i)
             os.mkdir(save_folder)
             break
-    
+  
     model = Model.ConvNet(features =opt.nof,out_channels=NB_LABEL,n1=opt.n1,n2=opt.n2,n3=opt.n3,k1 = 3,k2 = 3,k3= 3).to(device)
     index = range(NB_DATA)
     split = train_test_split(index,test_size = 0.2,random_state=1)
@@ -149,7 +143,7 @@ else :
         scaler = dataloader.normalization(opt.label_dir,opt.norm_method,split[0])
     else:
         scaler = None
-    t = Trainer(self,opt,model,device,save_fold,scaler):
+    t = Trainer(opt,model,device,save_fold,scaler)
     t.test(testloader,75)
     
 

@@ -23,9 +23,9 @@ import optuna
 import joblib
 from math import isnan
 import time
-NB_DATA = 24
-NB_LABEL = 11
-RESIZE_IMAGE = 288
+NB_DATA = 70
+NB_LABEL = 6
+RESIZE_IMAGE = 256
 
 study = optuna.create_study(sampler=optuna.samplers.TPESampler(), direction='minimize')
 
@@ -39,31 +39,20 @@ def normalization(csv_file,mode,indices):
     return scaler
 
 class Datasets(Dataset):
-    def __init__(self,opt, csv_file, image_dir, indices, transform=None):
+    def __init__(self,opt, csv_file, image_dir, scaler, transform=None):
         self.image_dir = image_dir
         self.labels = pd.read_csv(csv_file)
         self.transform = transform
-        self.indices = indices
         self.opt = opt
+        self.scaler= scaler
 
     def __len__(self):
         return len(self.labels)
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-        img_name = os.path.join(self.image_dir, str(self.labels.iloc[idx,0]))
-        if self.opt['norm_method']== "L2":
-            lab = preprocessing.normalize(self.labels.iloc[:,1:],axis=0)
-        elif self.opt['norm_method'] == "L1":
-            lab = preprocessing.normalize(self.labels.iloc[:,1:],norm='l1',axis=0)
-        elif self.opt['norm_method'] == "minmax":
-            scaler = preprocessing.MinMaxScaler()
-            scaler.fit(self.labels.iloc[self.indices,1:])
-            lab = scaler.transform(self.labels.iloc[:,1:])
-        elif self.opt['norm_method'] == "standardization":
-            scaler = preprocessing.StandardScaler()
-            scaler.fit(self.labels.iloc[self.indices,1:])
-            lab = scaler.transform(self.labels.iloc[:,1:])
+        img_name = os.path.join(self.image_dir, str(self.labels.iloc[idx,0].replace("mouse","MOUSE")))
+        lab = self.scaler.transform(self.labels.iloc[:,1:])
         lab = pd.DataFrame(lab)
         lab.insert(0,"File name", self.labels.iloc[:,0], True)
         lab.columns = self.labels.columns
@@ -75,13 +64,12 @@ class Datasets(Dataset):
             image = self.transform(image)
         im = image['ct'][tio.DATA]
         im = im.type(torch.FloatTensor)
-        print(im.type())
         return {"image":im, "label":labels}
     
 class NeuralNet(nn.Module):
     def __init__(self,activation,n1,n2,n3,out_channels):
         super().__init__()
-        self.fc1 = nn.Linear(36*36*36*12,n1)
+        self.fc1 = nn.Linear(32*32*32*12,n1)
         self.fc2 = nn.Linear(n1,n2)
         self.fc3 = nn.Linear(n2,n3)
         self.fc4 = nn.Linear(n3,out_channels)
@@ -99,7 +87,7 @@ class ConvNet(nn.Module):
         # initialize CNN layers 
         self.conv1 = nn.Conv3d(1,features,kernel_size = k1,stride = (1,1,1), padding = 1)
         self.conv2 = nn.Conv3d(features,features*2, kernel_size = k2, stride = (1,1,1), padding = 1)
-        self.conv3 = nn.Conv3d(features*2,36, kernel_size = k3, stride = (1,1,1), padding = 1)
+        self.conv3 = nn.Conv3d(features*2,32, kernel_size = k3, stride = (1,1,1), padding = 1)
         self.pool = nn.MaxPool3d((2,2,2))
         self.activation = activation
         # initialize NN layers
@@ -191,7 +179,7 @@ def test(model,testloader,epoch,opt):
             inputs, labels = data['image'],data['label']
             # reshape
             #inputs = inputs.reshape(1,1,RESIZE_IMAGE,RESIZE_IMAGE)
-            #labels = labels.reshape(1,NB_LABEL)
+            labels = labels.reshape(1,NB_LABEL)
             inputs, labels = inputs.to(device),labels.to(device)
             # loss
             outputs = model(inputs)
@@ -221,30 +209,30 @@ def objective(trial):
             os.mkdir(save_folder)
             break
     # Create the folder where to save results and checkpoints
-    opt = {'label_dir' : "./trab3d_11p.csv",
-           'image_dir' : "./data/3D_image_Centered_Reduced_ROI_Trab/Train",
+    opt = {'label_dir' : "./Train_Label_6p.csv",
+           'image_dir' : "./data/3D_centered_train",
            'train_cross' : "./cross_output.pkl",
-           #'batch_size' : trial.suggest_int('batch_size',1,2,step=1),
+           #'batch_size' : trial.suggest_int('batch_size',1,6,step=1),
            'batch_size':1,
            'model' : "ConvNet",
-           #'nof' : trial.suggest_int('nof',10,50),
-           'nof':24,
-           #'lr': trial.suggest_loguniform('lr',1e-6,1e-4),
-           'lr':0.00009,
-           'nb_epochs' : 300,
+           'nof' : trial.suggest_int('nof',10,50),
+           #'nof':24,
+           'lr': trial.suggest_loguniform('lr',1e-6,1e-4),
+           #'lr':0.00009,
+           'nb_epochs' : 250,
            'checkpoint_path' : "./",
            'mode': "Train",
            'cross_val' : False,
            'k_fold' : 1,
-           #'n1' : trial.suggest_int('n1', 80,180),
-           #'n2' : trial.suggest_int('n2',80,1800),
-           #'n3' : trial.suggest_int('n3',80,1800),
-           'n1':81,
-           'n2':1798,
-           'n3':748,
+           'n1' : trial.suggest_int('n1', 80,180),
+           'n2' : trial.suggest_int('n2',80,1800),
+           'n3' : trial.suggest_int('n3',80,1800),
+           #'n1':81,
+           #'n2':1798,
+           #'n3':748,
            'nb_workers' : 8,
            #'norm_method': trial.suggest_categorical('norm_method',["standardization","minmax"]),
-           'norm_method': "minmax",
+           'norm_method': "standardization",
            #'optimizer' :  trial.suggest_categorical("optimizer",[Adam, SGD]),
            'optimizer':Adam,
            'activation' : trial.suggest_categorical("activation", [F.relu]),
@@ -259,41 +247,26 @@ def objective(trial):
     
     print(opt["batch_size"])
     # Create Augmented Dataset
-    datasets_1 = Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA)) # Create dataset
     transforms_dict = {
         tio.RandomAffine(scales = 0,
-        degrees=(45,10,10),
-        translation=(0,500,500)),
-        }  
-    datasets_2 = Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
-    transforms_dict = {
-        tio.RandomAffine(scales = 0,
-        degrees=(90,0,0),
-        translation=(0,500,500)),
-        }  
-    datasets_3 = Datasets(csv_file = opt['label_dir'], image_dir = opt['image_dir'], opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
-    datasets = torch.utils.data.ConcatDataset([datasets_1, datasets_2, datasets_3])
-    
+        degrees=(15,10,10),
+        translation=(0,0,0)),
+        tio.RandomFlip(flip_probability=0.3)
+        }
     # Splitting
-    split = train_test_split(range(len(datasets)),test_size=0.2, random_state=42)
-    if opt['k_fold'] >1:
-        kf = KFold(n_splits = opt['k_fold'], shuffle=True)
-    else:
-        kf = train_test_split(split[0],test_size=0.1, random_state=42)
+    split = train_test_split(range(NB_DATA),test_size=0.2, random_state=42)
+    scaler = normalization(opt['label_dir'],"standardization",split[0])
+    datasets = Datasets(csv_file=opt['label_dir'],image_dir=opt['image_dir'],opt=opt,scaler = scaler,transform=tio.Compose(transforms_dict))
     print("start training")
     mse_total = np.zeros(opt['nb_epochs'])
     mse_train = []
     print("number of data :",len(datasets))
     # Normalization Scaler
-    if opt['norm_method'] == "standardization" or opt['norm_method'] == "minmax":
-        scaler = normalization(opt['label_dir'],opt['norm_method'],range(NB_DATA))
-    else:
-        scaler = None
-    
+
     #for train_index, test_index in kf.split(range(len(datasets))):
     for k in range(opt["k_fold"]):
-        train_index = kf[0]
-        test_index = kf[1]
+        train_index = split[0]
+        test_index = split[1]
         print("trainset :", train_index)
         print("testset :",test_index)
         mse_test = []
@@ -324,6 +297,6 @@ else:
     device = "cpu"
     print("running on cpu")
     
-study.optimize(objective,n_trials=1)
+study.optimize(objective,n_trials=10)
 with open("./cross_BPNN3D_thone.pkl","wb") as f:
     pickle.dump(study,f)

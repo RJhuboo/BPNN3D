@@ -1,4 +1,5 @@
 import torch
+import torchio as tio
 import os
 import numpy as np
 import pandas as pd
@@ -31,18 +32,7 @@ class Datasets(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         img_name = os.path.join(self.image_dir, str(self.labels.iloc[idx,0]))
-        if self.opt['norm_method']== "L2":
-            lab = preprocessing.normalize(self.labels.iloc[:,1:],axis=0)
-        elif self.opt['norm_method'] == "L1":
-            lab = preprocessing.normalize(self.labels.iloc[:,1:],norm='l1',axis=0)
-        elif self.opt['norm_method'] == "minmax":
-            scaler = preprocessing.MinMaxScaler()
-            scaler.fit(self.labels.iloc[self.indices,1:])
-            lab = scaler.transform(self.labels.iloc[:,1:])
-        elif self.opt['norm_method'] == "standardization":
-            scaler = preprocessing.StandardScaler()
-            scaler.fit(self.labels.iloc[self.indices,1:])
-            lab = scaler.transform(self.labels.iloc[:,1:])
+        lab = scaler.transform(self.labels.iloc[:,1:])
         lab = pd.DataFrame(lab)
         lab.insert(0,"File name", self.labels.iloc[:,0], True)
         lab.columns = self.labels.columns
@@ -55,7 +45,7 @@ class Datasets(Dataset):
         im = image['ct'][tio.DATA]
         im = im.type(torch.FloatTensor)
         print(im.type())
-        return {"image":im, "label":labels}
+        return {"image":im, "label":labels, "ID":lab.iloc[idx,0]}
 
 class Test_Datasets(Dataset):
     def __init__(self, image_dir, transform=None):
