@@ -4,26 +4,16 @@ import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 from torch.nn import MSELoss
-from torch.optim import Adam, SGD
-from sklearn.metrics import r2_score
-from skimage import io,transform
-from torchvision import transforms, utils
+from torch.optim import Adam
 from sklearn import preprocessing
-from matplotlib import pyplot as plt
-from sklearn.model_selection import KFold
-import random
 import pickle
-import torchio as tio
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import torch.nn as nn
 import torch.nn.functional as F
 import optuna
-import joblib
 from math import isnan
-import time
-NB_DATA = 70
+import h5py
+NB_DATA = 6872
 NB_LABEL = 6
 RESIZE_IMAGE = 256
 
@@ -51,25 +41,22 @@ class Datasets(Dataset):
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-        img_name = os.path.join(self.image_dir, str(self.labels.iloc[idx,0].replace("mouse","MOUSE")))
-        lab = self.scaler.transform(self.labels.iloc[:,1:])
-        lab = pd.DataFrame(lab)
-        lab.insert(0,"File name", self.labels.iloc[:,0], True)
-        lab.columns = self.labels.columns
-        labels = lab.iloc[idx,1:] # Takes all corresponding labels
-        labels = np.array([labels]) 
-        labels = labels.astype('float32')
-        image = tio.Subject(ct=tio.ScalarImage(img_name+".nii.gz")) # Loading Image
-        if self.transform:
-            image = self.transform(image)
-        im = image['ct'][tio.DATA]
-        im = im.type(torch.FloatTensor)
-        return {"image":im, "label":labels}
+        with h5py.File(self.image_dir,'r') as file_h5:
+            im = file_h5['patches']['data'][idx].astype(np.float32)
+            lab = self.scaler.transform(self.labels.iloc[:,1:])
+            lab = pd.DataFrame(lab)
+            lab.insert(0,"File name", self.labels.iloc[:,0], True)
+            lab.columns = self.labels.columns
+            labels = lab.iloc[idx,1:] # Takes all corresponding labels
+            labels = np.array([labels]) 
+            labels = labels.astype('float32')
+            
+            return {"image":im, "label":labels}
     
 class NeuralNet(nn.Module):
     def __init__(self,activation,n1,n2,n3,out_channels):
         super().__init__()
-        self.fc1 = nn.Linear(32*32*32*12,n1)
+        self.fc1 = nn.Linear(8*8*8*8,n1)
         self.fc2 = nn.Linear(n1,n2)
         self.fc3 = nn.Linear(n2,n3)
         self.fc4 = nn.Linear(n3,out_channels)
@@ -87,7 +74,7 @@ class ConvNet(nn.Module):
         # initialize CNN layers 
         self.conv1 = nn.Conv3d(1,features,kernel_size = k1,stride = (1,1,1), padding = 1)
         self.conv2 = nn.Conv3d(features,features*2, kernel_size = k2, stride = (1,1,1), padding = 1)
-        self.conv3 = nn.Conv3d(features*2,32, kernel_size = k3, stride = (1,1,1), padding = 1)
+        self.conv3 = nn.Conv3d(features*2,8, kernel_size = k3, stride = (1,1,1), padding = 1)
         self.pool = nn.MaxPool3d((2,2,2))
         self.activation = activation
         # initialize NN layers
@@ -209,8 +196,8 @@ def objective(trial):
             os.mkdir(save_folder)
             break
     # Create the folder where to save results and checkpoints
-    opt = {'label_dir' : "./Train_Label_6p.csv",
-           'image_dir' : "./data/3D_centered_train",
+    opt = {'label_dir' : "/gpfsstore/rech/tvs/uki75tv/3D_label.csv",
+           'image_dir' : "/gpfsstore/rech/tvs/uki75tv/output.h5",
            'train_cross' : "./cross_output.pkl",
            #'batch_size' : trial.suggest_int('batch_size',1,6,step=1),
            'batch_size':1,
@@ -246,17 +233,10 @@ def objective(trial):
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
     print(opt["batch_size"])
-    # Create Augmented Dataset
-    transforms_dict = {
-        tio.RandomAffine(scales = 0,
-        degrees=(15,10,10),
-        translation=(0,0,0)),
-        tio.RandomFlip(flip_probability=0.3)
-        }
     # Splitting
     split = train_test_split(range(NB_DATA),test_size=0.2, random_state=42)
     scaler = normalization(opt['label_dir'],"standardization",split[0])
-    datasets = Datasets(csv_file=opt['label_dir'],image_dir=opt['image_dir'],opt=opt,scaler = scaler,transform=tio.Compose(transforms_dict))
+    datasets = Datasets(csv_file=opt['label_dir'],image_dir=opt['image_dir'],opt=opt,scaler = scaler,transform=None)
     print("start training")
     mse_total = np.zeros(opt['nb_epochs'])
     mse_train = []
@@ -297,6 +277,6 @@ else:
     device = "cpu"
     print("running on cpu")
     
-study.optimize(objective,n_trials=10)
-with open("./cross_BPNN3D_thone.pkl","wb") as f:
+study.optimize(objective,n_trials=6)
+with open("./Human_patches.pkl","wb") as f:
     pickle.dump(study,f)
