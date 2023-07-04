@@ -110,7 +110,7 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
     for i, data in enumerate(trainloader):
         inputs, labels = data['image'].float(), data['label'].float()
         # reshape
-        #inputs = inputs.reshape(inputs.size(0),1,RESIZE_IMAGE,RESIZE_IMAGE)
+        inputs = inputs.reshape(inputs.size(0),1,inputs.size(2),inputs.size(2),inputs.size(2))
         labels = labels.reshape(labels.size(0),NB_LABEL)
         inputs, labels = inputs.to(device), labels.to(device)
         # zero the parameter gradients
@@ -162,7 +162,7 @@ def test(model,testloader,epoch,opt):
         for i, data in enumerate(testloader):
             inputs, labels = data['image'],data['label']
             # reshape
-            #inputs = inputs.reshape(1,1,RESIZE_IMAGE,RESIZE_IMAGE)
+            inputs = inputs.reshape(1,1,inputs.size(2),inputs.size(2),inputs.size(2))
             labels = labels.reshape(1,NB_LABEL)
             inputs, labels = inputs.to(device),labels.to(device)
             # loss
