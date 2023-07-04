@@ -120,10 +120,7 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
         outputs = model(inputs)
         Loss = MSELoss()
         loss = Loss(outputs,labels)
-        if isnan(loss) == True:
-            print("there is nan is the loss !")
-            print(outputs)
-            print(labels)
+        
 
         loss.backward()
         optimizer.step()
@@ -248,8 +245,6 @@ def objective(trial):
     for k in range(opt["k_fold"]):
         train_index = split[0]
         test_index = split[1]
-        print("trainset :", train_index)
-        print("testset :",test_index)
         mse_test = []
         trainloader = DataLoader(datasets, batch_size = opt['batch_size'], sampler = train_index, num_workers = opt['nb_workers'])
         testloader =DataLoader(datasets, batch_size = 1, sampler = test_index, num_workers = opt['nb_workers'])
