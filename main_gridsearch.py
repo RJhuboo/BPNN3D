@@ -26,7 +26,7 @@ def normalization(csv_file,mode,indices):
         scaler = preprocessing.StandardScaler()
     elif mode == "minmax":
         scaler = preprocessing.MinMaxScaler()
-    scaler.fit(Datagpu_p13.iloc[indices,1:])
+    scaler.fit(Data.iloc[indices,1:])
     return scaler
 
 class Datasets(Dataset):
