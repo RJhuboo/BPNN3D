@@ -6,6 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.nn import MSELoss
 from torch.optim import Adam
 from sklearn import preprocessing
+from torch.utils.tensorboard import SummaryWriter
 import pickle
 from sklearn.model_selection import train_test_split
 import torch.nn as nn
@@ -25,7 +26,7 @@ def normalization(csv_file,mode,indices):
         scaler = preprocessing.StandardScaler()
     elif mode == "minmax":
         scaler = preprocessing.MinMaxScaler()
-    scaler.fit(Data.iloc[indices,1:])
+    scaler.fit(Datagpu_p13.iloc[indices,1:])
     return scaler
 
 class Datasets(Dataset):
@@ -239,6 +240,7 @@ def objective(trial):
     mse_train = []
     print("number of data :",len(datasets))
     # Normalization Scaler
+    writer = SummaryWriter(log_dir='runs/'+'evaluation')
 
     #for train_index, test_index in kf.split(range(len(datasets))):
     for k in range(opt["k_fold"]):
@@ -251,10 +253,14 @@ def objective(trial):
         model.apply(reset_weights)
         optimizer = opt['optimizer'](model.parameters(), lr=opt['lr'])
         for epoch in range(opt['nb_epochs']):
-            mse_train.append(train(model = model, trainloader = trainloader,optimizer = optimizer,epoch = epoch,opt=opt))
-            mse_test.append(test(model=model,testloader=testloader,epoch=epoch,opt=opt))
+            train_epoch = train(model = model, trainloader = trainloader,optimizer = optimizer,epoch = epoch,opt=opt)
+            mse_train.append(train_epoch)
+            test_epoch = test(model=model,testloader=testloader,epoch=epoch,opt=opt)
+            mse_test.append(test_epoch)
+            writer.add_scalars('Loss',{'train':train_epoch,'test':test_epoch},epoch)
         mse_total = mse_total + np.array(mse_test)
     mse_mean = mse_total / opt['k_fold']
+    writer.close()
     print("mse_mean :", mse_mean)
     i_min = np.where(mse_mean == np.min(mse_mean))
     print('best epoch :', i_min[0][0]+1)
@@ -272,6 +278,6 @@ else:
     device = "cpu"
     print("running on cpu")
     
-study.optimize(objective,n_trials=6)
+study.optimize(objective,n_trials=1)
 with open("./Human_patches.pkl","wb") as f:
     pickle.dump(study,f)
