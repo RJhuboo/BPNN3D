@@ -44,7 +44,7 @@ class Datasets(Dataset):
             idx = idx.tolist()
         with h5py.File(self.image_dir,'r') as file_h5:
             im = file_h5['patches']['data'][idx].astype(np.float32)
-            lab = self.scaler.transform(self.labels.iloc[:,1:])
+            lab = self.scaler.transform(self.labels.iloc[:,-2])
             lab = pd.DataFrame(lab)
             lab.insert(0,"File name", self.labels.iloc[:,0], True)
             lab.columns = self.labels.columns
