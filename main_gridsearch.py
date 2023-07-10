@@ -132,10 +132,10 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
         labels, outputs = np.array(labels), np.array(outputs)
         labels, outputs = labels.reshape(NB_LABEL,len(inputs)), outputs.reshape(NB_LABEL,len(inputs))
         #Loss = MSELoss()
-        if i % opt['batch_size'] == opt['batch_size']-1:
-            print('[%d %5d], loss: %.3f' %
-                  (epoch + 1, i+1, running_loss/opt['batch_size']))
-            running_loss = 0.0
+        #if i % opt['batch_size'] == opt['batch_size']-1:
+        #    print('[%d %5d], loss: %.3f' %
+        #          (epoch + 1, i+1, running_loss/opt['batch_size']))
+        #    running_loss = 0.0
         
     # displaying results
     print("nb", train_total)
