@@ -51,6 +51,7 @@ class Datasets(Dataset):
             labels = lab.iloc[idx,1:] # Takes all corresponding labels
             labels = np.array([labels]) 
             labels = labels.astype('float32')
+            print(labels)
             
             return {"image":im, "label":labels}
     
