@@ -15,7 +15,7 @@ import optuna
 from math import isnan
 import h5py
 NB_DATA = 6872
-NB_LABEL = 10
+NB_LABEL = 1
 RESIZE_IMAGE = 256
 
 study = optuna.create_study(sampler=optuna.samplers.TPESampler(), direction='minimize')
