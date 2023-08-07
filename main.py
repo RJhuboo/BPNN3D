@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--label_dir", default = "/gpfsstore/rech/tvs/uki75tv/3D_label.csv", help = "path to label csv file")
 parser.add_argument("--image_dir", default = "/gpfsstore/rech/tvs/uki75tv/output.h5",help = "path to image directory")
 parser.add_argument("--train_cross", default = "./cross_output.pkl", help = "filename of the output of the cross validation")
-parser.add_argument("--batch_size", type=int, default = 6, help = "number of batch")
+parser.add_argument("--batch_size", type=int, default = 16, help = "number of batch")
 parser.add_argument("--model", default = "MultiNet", help="Choose model : Unet or ConvNet") 
 parser.add_argument("--nof", type=int, default = 30, help = "number of filter")
 parser.add_argument("--lr", type=float, default = 0.00001, help = "learning rate")
@@ -105,7 +105,7 @@ def train():
     # Start training
     t = Trainer(opt,model,device,save_folder,scaler)
     for epoch in range(opt.nb_epochs):
-        mse_train = t.train(trainloader,epoch)
+        mse_train = t.train(trainloader,epoch,writer)
         mse_test = t.test(testloader,epoch,writer)
         score_mse_t.append(mse_train)
         score_mse_v.append(mse_test)

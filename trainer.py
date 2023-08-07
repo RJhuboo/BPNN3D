@@ -25,7 +25,7 @@ class Trainer():
         self.optimizer = Adam(self.model.parameters(), lr=self.opt.lr)
         self.criterion = MSELoss()
         
-    def train(self, trainloader, epoch ,steps_per_epochs=20):
+    def train(self, trainloader, epoch, writer ,steps_per_epochs=20):
         self.model.train()
         print("starting training")
         print("----------------")
@@ -61,7 +61,12 @@ class Trainer():
                 print('[%d %5d], loss: %.3f' %
                       (epoch + 1, i+1, running_loss/self.opt.batch_size))
                 running_loss = 0.0
-                
+            for i in range(np.shape(labels)[1]):
+                    fig = plt.figure()
+                    plt.plot(labels[:,i],outputs[:,i],"o")
+                    plt.plot(labels[:,i],labels[:,i])
+                    plt.show()
+                    writer.add_figure("Train/"+str(epoch),fig)           
         # displaying results
         mse = train_loss / train_total
         print('Epoch [{}], Loss: {}'.format(epoch+1, train_loss/train_total), end='')
