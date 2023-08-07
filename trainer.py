@@ -112,6 +112,8 @@ class Trainer():
                 #if self.opt.norm_method == "standardization" or self.opt.norm_method == "minmax":
                 #    outputs = self.scaler.inverse_transform(outputs)
                 #    labels = self.scaler.inverse_transform(labels)
+                print(outputs)
+                print(np.shape(outputs))
                 output.append(outputs)
                 label.append(labels)
                 IDs[i] = ID[0]

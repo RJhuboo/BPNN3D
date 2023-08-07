@@ -87,7 +87,6 @@ def train():
     #datasets_3 = dataloader.Datasets(csv_file = opt.label_dir, image_dir = opt.image_dir, opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
     #datasets = torch.utils.data.ConcatDataset([datasets_1, datasets_2, datasets_3])
     split = train_test_split(range(NB_DATA),test_size = 0.2,random_state=42)
-    print(split[0])
     if opt.norm_method == "standardization" or opt.norm_method == "minmax":
         scaler = dataloader.normalization(opt.label_dir,opt.norm_method,split[0])
     else:
