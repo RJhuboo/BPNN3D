@@ -23,7 +23,6 @@ class Datasets(Dataset):
         self.image_dir = image_dir
         self.labels = pd.read_csv(csv_file)
         self.transform = transform
-        self.indices = indices
         self.opt = opt
         self.scaler = scaler
         
