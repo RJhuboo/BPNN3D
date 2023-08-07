@@ -28,7 +28,7 @@ parser.add_argument("--image_dir", default = "/gpfsstore/rech/tvs/uki75tv/output
 parser.add_argument("--train_cross", default = "./cross_output.pkl", help = "filename of the output of the cross validation")
 parser.add_argument("--batch_size", type=int, default = 6, help = "number of batch")
 parser.add_argument("--model", default = "MultiNet", help="Choose model : Unet or ConvNet") 
-parser.add_argument("--nof", type=int, default = 10, help = "number of filter")
+parser.add_argument("--nof", type=int, default = 30, help = "number of filter")
 parser.add_argument("--lr", type=float, default = 0.001, help = "learning rate")
 parser.add_argument("--nb_epochs", type=int, default = 100, help = "number of epochs")
 parser.add_argument("--checkpoint_path", default = "./", help = "path to save or load checkpoint")
