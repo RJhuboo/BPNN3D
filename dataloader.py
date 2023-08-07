@@ -1,5 +1,4 @@
 import torch
-import torchio as tio
 import os
 import numpy as np
 import pandas as pd
