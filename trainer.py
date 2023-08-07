@@ -37,7 +37,8 @@ class Trainer():
             inputs, labels = data['image'], data['label']
             
             # reshape
-            labels = labels.reshape(labels.size(0),self.NB_LABEL)
+            inputs = inputs.reshape(inputs.size(0),1,inputs.size(2),inputs.size(2),inputs.size(2))
+            labels = labels.reshape(labels.size(0),1)
             inputs, labels = inputs.to(self.device), labels.to(self.device)
             
             # zero the parameter gradients
@@ -92,7 +93,8 @@ class Trainer():
                 inputs, labels, ID = data['image'],data['label'],data['ID']
                 # reshape
                 inputs, labels = inputs.to(self.device),labels.to(self.device)
-                
+                inputs = inputs.reshape(inputs.size(0),1,inputs.size(2),inputs.size(2),inputs.size(2))
+                labels = labels.reshape(labels.size(0),1)
                 # loss
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs,labels)
