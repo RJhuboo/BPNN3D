@@ -1,15 +1,12 @@
 import torch
 import os
 import numpy as np
-import pandas as pd
-import argparse
 from torch.optim import Adam, SGD
 from torch.nn import MSELoss
-from sklearn.model_selection import KFold
 from sklearn.metrics import r2_score
 import pickle
-from sklearn.preprocessing import StandardScaler
-from torchvision import transforms
+import matplotlib.pyplot as plt
+
 
 def MSE(y_predicted,y):
     squared_error = (y_predicted - y) **2
@@ -74,7 +71,7 @@ class Trainer():
         torch.save(self.model.state_dict(),os.path.join(self.opt.checkpoint_path,check_name))
         return mse
 
-    def test(self,testloader,epoch):
+    def test(self,testloader,epoch,writer):
 
         test_loss = 0
         test_total = 0
@@ -113,11 +110,22 @@ class Trainer():
                 if self.opt.norm_method == "standardization" or self.opt.norm_method == "minmax":
                     outputs = self.scaler.inverse_transform(outputs)
                     labels = self.scaler.inverse_transform(labels)
-                output[i] = outputs
-                label[i] = labels
+                output.append(outputs)
+                label.append(labels)
                 IDs[i] = ID[0]
+                label = np.array(label)
+                output = np.array(output)
+                size_label=len(label)
+                output,label = output.reshape((size_label,1)), label.reshape((size_label,1))
+                print(np.shape(label))
+                for i in range(np.shape(label)[1]):
+                    fig,ax = plt.subplots()
+                    ax.scatter(label[:,i],output[:,i],label='slice')
+                    ax.plot(label[:,i],label[:,i])
+                    writer.add_figure(str(i),fig)
             name_out = "./result" + str(epoch) + ".pkl"
             mse = test_loss/test_total
+            
             with open(os.path.join(self.save_fold,name_out),"wb") as f:
                 pickle.dump({"output":output,"label":label,"ID":IDs},f)
             #with open(os.path.join(self.save_fold,name_lab),"wb") as f:

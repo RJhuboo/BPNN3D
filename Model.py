@@ -1,4 +1,3 @@
-from collections import OrderedDict
 import torch
 from torchvision.utils import make_grid
 import torch.nn as nn
@@ -8,7 +7,7 @@ import torch.nn.functional as F
 class NeuralNet(nn.Module):
     def __init__(self,n1,n2,n3,out_channels):
         super().__init__()
-        self.fc1 = nn.Linear(36*36*36*12,n1)
+        self.fc1 = nn.Linear(8*8*8*8,n1)
         self.fc2 = nn.Linear(n1,n2)
         self.fc3 = nn.Linear(n2,n3)
         self.fc4 = nn.Linear(n3,out_channels)
