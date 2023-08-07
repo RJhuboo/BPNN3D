@@ -116,9 +116,9 @@ class Trainer():
                 output.append(outputs[0])
                 label.append(labels[0])
                 IDs[i] = ID[0]
-                label = np.array(label)
-                output = np.array(output)
-                size_label=len(label)
+            label = np.array(label)
+            output = np.array(output)
+            size_label=len(label)
             output,label = output.reshape((size_label,1)), label.reshape((size_label,1))
             print(np.shape(label))
             for i in range(np.shape(label)[1]):
