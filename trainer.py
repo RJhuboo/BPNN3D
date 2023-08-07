@@ -122,10 +122,11 @@ class Trainer():
             output,label = output.reshape((size_label,1)), label.reshape((size_label,1))
             print(np.shape(label))
             for i in range(np.shape(label)[1]):
-                fig,ax = plt.subplots()
-                ax.scatter(label[:,i],output[:,i],label='slice')
-                ax.plot(label[:,i],label[:,i])
-                writer.add_figure(str(i),fig)
+                fig = plt.figure()
+                plt.plot(label[:,i],output[:,i],label='slice')
+                plt.plot(label[:,i],label[:,i])
+                plt.show()
+                writer.add_figure(str(epoch),fig)
             name_out = "./result" + str(epoch) + ".pkl"
             mse = test_loss/test_total
             
