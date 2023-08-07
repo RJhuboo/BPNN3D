@@ -77,8 +77,8 @@ class Trainer():
         test_loss = 0
         test_total = 0
         mse_score = 0.0
-        output = {}
-        label = {}
+        output = []
+        label = []
         IDs = {}
         # Loading Checkpoint
         if self.opt.mode == "Test":
