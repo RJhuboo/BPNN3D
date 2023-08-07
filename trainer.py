@@ -123,7 +123,7 @@ class Trainer():
             print(np.shape(label))
             for i in range(np.shape(label)[1]):
                 fig = plt.figure()
-                plt.plot(label[:,i],output[:,i],label='slice')
+                plt.plot(label[:,i],output[:,i],"o")
                 plt.plot(label[:,i],label[:,i])
                 plt.show()
                 writer.add_figure(str(epoch),fig)
