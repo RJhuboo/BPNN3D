@@ -61,6 +61,7 @@ class Trainer():
                 print('[%d %5d], loss: %.3f' %
                       (epoch + 1, i+1, running_loss/self.opt.batch_size))
                 running_loss = 0.0
+            print(np.shape(outputs))
             for i in range(np.shape(labels)[1]):
                     fig = plt.figure()
                     plt.plot(labels[:,i],outputs[:,i],"o")
