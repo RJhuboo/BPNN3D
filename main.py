@@ -6,12 +6,11 @@ import argparse
 from sklearn.model_selection import KFold
 from torch.utils.data import Dataset, DataLoader
 import pickle
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import Model
 from trainer import Trainer
 import dataloader
+from torch.utils.tensorboard import SummaryWriter
 
 # GPU or CPU
 if torch.cuda.is_available():  
@@ -87,7 +86,6 @@ def train():
     #     }  
     #datasets_3 = dataloader.Datasets(csv_file = opt.label_dir, image_dir = opt.image_dir, opt=opt, indices = range(NB_DATA), transform = tio.Compose(transforms_dict))
     #datasets = torch.utils.data.ConcatDataset([datasets_1, datasets_2, datasets_3])
-    index = range(len(datasets))
     split = train_test_split(index,test_size = 0.2,random_state=42)
     if opt.norm_method == "standardization" or opt.norm_method == "minmax":
         scaler = dataloader.normalization(opt.label_dir,opt.norm_method,split[0])
