@@ -26,7 +26,7 @@ class ConvNet(nn.Module):
         # initialize CNN layers 
         self.conv1 = nn.Conv3d(1,features,kernel_size = k1,stride = (1,1,1), padding = 1)
         self.conv2 = nn.Conv3d(features,features*2, kernel_size = k2, stride = (1,1,1), padding = 1)
-        self.conv3 = nn.Conv3d(features*2,36, kernel_size = k3, stride = (1,1,1), padding = 1)
+        self.conv3 = nn.Conv3d(features*2,8, kernel_size = k3, stride = (1,1,1), padding = 1)
         self.pool = nn.MaxPool3d((2,2,2))        
         self.neural = NeuralNet(n1,n2,n3,out_channels)
         # dropout
