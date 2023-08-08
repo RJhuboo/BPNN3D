@@ -67,12 +67,13 @@ class Trainer():
             plt.plot(labels[:,0],labels[:,0],"r")
             count = 0
             for x,y in zip(labels[:,0],outputs[:,0]):
-                plt.text(x,y,IDs[count],color='black',font=12)
+                #plt.text(x,y,IDs[count],color='black',font=12)
                 if abs(outputs[count,0]) < 0.2 and abs(outputs[count,0]-labels[count,0]) > 1:
+                    print(IDs[count])
                     print("Something is strainge: output = {} and label = {}".format(outputs[count,0],labels[count,0]))
                     count += 1
         plt.show()
-        writer.add_figure("Train/"+str(epoch),fig)           
+        writer.add_figure("Train/"+str(epoch),fig)
         # displaying results
         mse = train_loss / train_total
         print('Epoch [{}], Loss: {}'.format(epoch+1, train_loss/train_total), end='')
