@@ -63,6 +63,7 @@ class Trainer():
                       (epoch + 1, i+1, running_loss/self.opt.batch_size))
                 running_loss = 0.0
             labels, outputs = labels.cpu().detach().numpy(), outputs.cpu().detach().numpy()
+            plt.plot(2,3,'ro')
             plt.plot(labels[:,0],outputs[:,0],"bo")
             plt.plot(labels[:,0],labels[:,0],"r")
             count = 0
