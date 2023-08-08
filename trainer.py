@@ -33,6 +33,7 @@ class Trainer():
         train_total = 0
         running_loss = 0.0
         mse_score = 0.0
+        fig = plt.figure()
         for i, data in enumerate(trainloader,0):
             inputs, labels = data['image'], data['label']
             
@@ -62,12 +63,10 @@ class Trainer():
                       (epoch + 1, i+1, running_loss/self.opt.batch_size))
                 running_loss = 0.0
             labels, outputs = labels.cpu().detach().numpy(), outputs.cpu().detach().numpy()
-            for i in range(np.shape(labels)[1]):
-                    fig = plt.figure()
-                    plt.plot(labels[:,i],outputs[:,i],"o")
-                    plt.plot(labels[:,i],labels[:,i])
-                    plt.show()
-                    writer.add_figure("Train/"+str(epoch),fig)           
+            plt.plot(labels[:,0],outputs[:,0],"bo")
+            plt.plot(labels[:,0],labels[:,0],"r")
+        plt.show()
+        writer.add_figure("Train/"+str(epoch),fig)           
         # displaying results
         mse = train_loss / train_total
         print('Epoch [{}], Loss: {}'.format(epoch+1, train_loss/train_total), end='')
