@@ -67,8 +67,9 @@ class Trainer():
             plt.plot(labels[:,0],labels[:,0],"r")
             count = 0
             for x,y in zip(labels[:,0],outputs[:,0]):
+                print(count)
                 #plt.text(x,y,IDs[count],color='black',font=12)
-                if abs(outputs[count,0]) < 0.2 and abs(outputs[count,0]-labels[count,0]) > 1:
+                if abs(outputs[count,0]) < 0.2 and labels[count,0] > 2:
                     print(IDs[count])
                     print("Something is strainge: output = {} and label = {}".format(outputs[count,0],labels[count,0]))
                     count += 1
