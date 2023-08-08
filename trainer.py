@@ -35,7 +35,7 @@ class Trainer():
         mse_score = 0.0
         fig = plt.figure()
         for i, data in enumerate(trainloader,0):
-            inputs, labels = data['image'], data['label']
+            inputs, labels, IDs = data['image'], data['label'], data["ID"]
             
             # reshape
             inputs = inputs.reshape(inputs.size(0),1,inputs.size(2),inputs.size(2),inputs.size(2))
@@ -65,6 +65,12 @@ class Trainer():
             labels, outputs = labels.cpu().detach().numpy(), outputs.cpu().detach().numpy()
             plt.plot(labels[:,0],outputs[:,0],"bo")
             plt.plot(labels[:,0],labels[:,0],"r")
+            count = 0
+            for x,y in zip(labels[:,0],outputs[:,0]):
+                plt.text(x,y,IDs[count],color='black',font=12)
+                if abs(outputs[count,0]) < 0.2 and abs(outputs[count,0]-labels[count,0]) > 1:
+                    print("Something is strainge: output = {} and label = {}".format(outputs[count,0],labels[count,0]))
+                    count += 1
         plt.show()
         writer.add_figure("Train/"+str(epoch),fig)           
         # displaying results
