@@ -14,7 +14,7 @@ import torch.nn.functional as F
 import optuna
 from math import isnan
 import h5py
-NB_DATA = 6872
+NB_DATA = 6846
 NB_LABEL = 1
 RESIZE_IMAGE = 256
 
