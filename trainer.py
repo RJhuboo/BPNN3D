@@ -151,38 +151,3 @@ class Trainer():
         print(' Test_loss: {}'.format(test_loss/test_total))
         return mse
     
-    def inference(infloader,epoch):
-       
-        output = {}
-        IDs = {}
-        # Loading Checkpoint
-        check_name = "BPNN_checkpoint_" + str(epoch) + ".pth"
-        self.model.load_state_dict(torch.load(os.path.join(self.opt.checkpoint_path,check_name)))
-        self.model.eval()
-
-        # Testing
-        with torch.no_grad():
-            for i, data in enumerate(testloader):
-                inputs, ID = data['image'],data['ID']
-                # reshape
-                inputs = inputs.reshape(1,1,self.size_image,self.size_image)
-                inputs = inputs.to(self.device)
-                outputs = self.model(inputs)
-                outputs = outputs.cpu().detach().numpy()
-                outputs = np.array(outputs)
-                outputs=outputs.reshape(1,self.NB_LABEL)
-                
-                if self.opt.norm_method == "standardization" or self.opt.norm_method == "minmax":
-                    outputs = self.scaler.inverse_transform(outputs)
-                print("output :",outputs)
-                output[i] = outputs
-                label[i] = labels
-                IDs[i] = ID[0]
-            name_out = "./result" + str(epoch) + ".pkl"
-            mse = test_loss/test_total
-            with open(os.path.join(self.save_fold,name_out),"wb") as f:
-                pickle.dump({"output":output,"label":label,"ID":IDs},f)
-            #with open(os.path.join(self.save_fold,name_lab),"wb") as f:
-                #pickle.dump(label,f)
-           
-        print(' Test_loss: {}'.format(test_loss/test_total))

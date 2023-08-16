@@ -11,6 +11,7 @@ import h5py
 
 def normalization(csv_file,mode,indices):
     Data = pd.read_csv(csv_file)
+    print(len(Data))
     if mode == "standardization":
         scaler = preprocessing.StandardScaler()
     elif mode == "minmax":
