@@ -34,6 +34,7 @@ class Datasets(Dataset):
         #img_name = os.path.join(self.image_dir, str(self.labels.iloc[idx,0]))
         with h5py.File(self.image_dir,'r') as file_h5:
             im = file_h5['patches']['data'][idx].astype(np.float32)
+            print("Image unique:",np.unique(im))
             lab = self.scaler.transform(self.labels.iloc[:,1:])
             lab = pd.DataFrame(lab)
             lab.insert(0,"File name", self.labels.iloc[:,0], True)

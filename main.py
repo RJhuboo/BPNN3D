@@ -41,7 +41,7 @@ parser.add_argument("--nb_workers", type=int, default = 0, help ="number of work
 parser.add_argument("--norm_method", type=str, default = "standardization", help = "choose how to normalize bio parameters")
 parser.add_argument("--NB_LABEL", type=int, default = 1, help = "specify the number of labels")
 opt = parser.parse_args()
-NB_DATA = 6872
+NB_DATA = 6847
 PERCENTAGE_TEST = 20
 SIZE_IMAGE = 256
 NB_LABEL = opt.NB_LABEL
