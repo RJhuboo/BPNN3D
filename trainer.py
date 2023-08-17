@@ -39,7 +39,7 @@ class Trainer():
             
             # reshape
             inputs = inputs.reshape(inputs.size(0),1,inputs.size(2),inputs.size(2),inputs.size(2))
-            labels = labels.reshape(labels.size(0),1)
+            labels = labels.reshape(labels.size(0),6)
             inputs, labels = inputs.to(self.device), labels.to(self.device)
             
             # zero the parameter gradients
