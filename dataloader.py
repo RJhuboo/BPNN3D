@@ -1,4 +1,5 @@
 import torch
+import torchio as tio
 import os
 import numpy as np
 import pandas as pd
@@ -45,6 +46,9 @@ class Datasets(Dataset):
             labels = lab.iloc[idx,1:] # Takes all corresponding labels
             labels = np.array([labels]) 
             labels = labels.astype('float32')
+            im = im.reshape((1,64,64,64))
+            flip = tio.RandomFlip(axes=('LR',))
+            im = flip(im)
             #image = tio.Subject(ct=tio.ScalarImage(img_name+".nii.gz")) # Loading Image
             #if self.transform:
             #    image = self.transform(image)

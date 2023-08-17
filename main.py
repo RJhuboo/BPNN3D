@@ -35,8 +35,8 @@ parser.add_argument("--checkpoint_path", default = "./", help = "path to save or
 parser.add_argument("--mode", default = "Train", help = "Mode used : Train, Using or Test")
 parser.add_argument("--k_fold", type=int, default = 1, help = "Number of splitting for k cross-validation")
 parser.add_argument("--n1", type=int, default = 240, help = "number of neurons in the first layer of the neural network")
-parser.add_argument("--n2", type=int, default = 200, help = "number of neurons in the second layer of the neural network")
-parser.add_argument("--n3", type=int, default = 200, help = "number of neurons in the third layer of the neural network")
+parser.add_argument("--n2", type=int, default = 150, help = "number of neurons in the second layer of the neural network")
+parser.add_argument("--n3", type=int, default = 100, help = "number of neurons in the third layer of the neural network")
 parser.add_argument("--nb_workers", type=int, default = 0, help ="number of workers for datasets")
 parser.add_argument("--norm_method", type=str, default = "standardization", help = "choose how to normalize bio parameters")
 parser.add_argument("--NB_LABEL", type=int, default = 6, help = "specify the number of labels")
@@ -101,7 +101,7 @@ def train():
     model = Model.ConvNet(features =opt.nof,out_channels=NB_LABEL,n1=opt.n1,n2=opt.n2,n3=opt.n3,k1 = 3,k2 = 3,k3= 3).to(device)
     torch.manual_seed(5)
 
-    writer = SummaryWriter(log_dir='runs/'+'training')
+    writer = SummaryWriter(log_dir='runs/'+'training2')
     # Start training
     t = Trainer(opt,model,device,save_folder,scaler)
     for epoch in range(opt.nb_epochs):
