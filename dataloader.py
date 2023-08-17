@@ -42,7 +42,7 @@ class Datasets(Dataset):
             lab = pd.DataFrame(lab)
             lab.insert(0,"File name", self.labels.iloc[:,0], True)
             lab.columns = self.labels.columns
-            labels = lab.iloc[idx,:] # Takes all corresponding labels
+            labels = lab.iloc[idx,1:] # Takes all corresponding labels
             labels = np.array([labels]) 
             labels = labels.astype('float32')
             #image = tio.Subject(ct=tio.ScalarImage(img_name+".nii.gz")) # Loading Image

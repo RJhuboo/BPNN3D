@@ -96,7 +96,7 @@ class Trainer():
                 # reshape
                 inputs, labels = inputs.to(self.device),labels.to(self.device)
                 inputs = inputs.reshape(inputs.size(0),1,inputs.size(2),inputs.size(2),inputs.size(2))
-                labels = labels.reshape(labels.size(0),1)
+                labels = labels.reshape(labels.size(0),6)
                 # loss
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs,labels)
