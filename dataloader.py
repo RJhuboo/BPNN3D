@@ -34,9 +34,8 @@ class Datasets(Dataset):
             idx = idx.tolist()
         #img_name = os.path.join(self.image_dir, str(self.labels.iloc[idx,0]))
         with h5py.File(self.image_dir,"r") as file_h5:
-            #print(file_h5.keys())
-            print(idx)
-            im = file_h5[str(idx)].astype(np.float32)
+            key = sorted(file_h5.keys())[idx]
+            im = file_h5[key].astype(np.float32)
             #print(im[:,:,2])
             lab = self.scaler.transform(self.labels.iloc[:,1:])
             lab = pd.DataFrame(lab)
