@@ -14,8 +14,10 @@ import torch.nn.functional as F
 import optuna
 from math import isnan
 import h5py
-NB_DATA = 6846
-NB_LABEL = 1
+import torchio as tio
+
+NB_DATA = 6847
+NB_LABEL = 6
 RESIZE_IMAGE = 256
 
 study = optuna.create_study(sampler=optuna.samplers.TPESampler(), direction='minimize')
@@ -43,15 +45,18 @@ class Datasets(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         with h5py.File(self.image_dir,'r') as file_h5:
-            im = file_h5['patches']['data'][idx].astype(np.float32)
+            im = file_h5[str(idx)]#.astype(np.float32)
+            im = np.array(im).astype(np.float32)
             lab = self.scaler.transform(self.labels.iloc[:,1:])
             lab = pd.DataFrame(lab)
             lab.insert(0,"File name", self.labels.iloc[:,0], True)
             lab.columns = self.labels.columns
-            labels = lab.iloc[idx,-2] # Takes all corresponding labels
+            labels = lab.iloc[idx,1:] # Takes all corresponding labels
             labels = np.array([labels]) 
             labels = labels.astype('float32')
-            
+            im = im.reshape((1,64,64,64))
+            flip = tio.RandomFlip(axes=('LR',))
+            im = flip(im)
             return {"image":im, "label":labels}
     
 class NeuralNet(nn.Module):
@@ -278,6 +283,6 @@ else:
     device = "cpu"
     print("running on cpu")
     
-study.optimize(objective,n_trials=1)
-with open("./Human_patches.pkl","wb") as f:
+study.optimize(objective,n_trials=10)
+with open("./Human_3D.pkl","wb") as f:
     pickle.dump(study,f)
