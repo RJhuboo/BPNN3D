@@ -34,6 +34,7 @@ class Datasets(Dataset):
             idx = idx.tolist()
         #img_name = os.path.join(self.image_dir, str(self.labels.iloc[idx,0]))
         with h5py.File(self.image_dir,"r") as file_h5:
+            print(file_h5.keys())
             im = file_h5[str(idx)].astype(np.float32)
             print(im[:,:,2])
             lab = self.scaler.transform(self.labels.iloc[:,1:])
