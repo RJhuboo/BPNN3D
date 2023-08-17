@@ -124,9 +124,9 @@ class Trainer():
             output,label = output.reshape((size_label,6)), label.reshape((size_label,6))
             print(np.shape(label))
             for i in range(np.shape(label)[1]):
-                fig,ax = plt.figure()
-                ax.plot(label[:,i],output[:,i],"o")
-                ax.plot(label[:,i],label[:,i])
+                fig = plt.figure()
+                plt.plot(label[:,i],output[:,i],"o")
+                plt.plot(label[:,i],label[:,i])
                 writer.add_figure("Test/"+str(epoch)+str(i),fig)
             name_out = "./result" + str(epoch) + ".pkl"
             mse = test_loss/test_total
