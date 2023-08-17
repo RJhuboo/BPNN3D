@@ -127,7 +127,7 @@ class Trainer():
                 fig = plt.figure()
                 plt.plot(label[:,i],output[:,i],"o")
                 plt.plot(label[:,i],label[:,i])
-                writer.add_figure("Test/"+str(epoch)+str(i),fig)
+                writer.add_figure("Test/"+str(epoch)+"/"+str(i),fig)
             name_out = "./result" + str(epoch) + ".pkl"
             mse = test_loss/test_total
             
