@@ -63,18 +63,7 @@ class Trainer():
                       (epoch + 1, i+1, running_loss/self.opt.batch_size))
                 running_loss = 0.0
             labels, outputs = labels.cpu().detach().numpy(), outputs.cpu().detach().numpy()
-            plt.plot(2,3,'ro')
-            plt.plot(labels[:,0],outputs[:,0],"bo")
-            plt.plot(labels[:,0],labels[:,0],"r")
-            count = 0
-            for count in range(outputs.shape[0]):
-                #plt.text(x,y,IDs[count],color='black',font=12)
-                if abs(outputs[count,0]) < 0.2 and labels[count,0] > 2:
-                    print(IDs[count])
-                    print("Something is strainge: output = {} and label = {}".format(outputs[count,0],labels[count,0]))
-                    
-        plt.show()
-        writer.add_figure("Train/"+str(epoch),fig)
+
         # displaying results
         mse = train_loss / train_total
         print('Epoch [{}], Loss: {}'.format(epoch+1, train_loss/train_total), end='')
@@ -126,20 +115,19 @@ class Trainer():
                 #    outputs = self.scaler.inverse_transform(outputs)
                 #    labels = self.scaler.inverse_transform(labels)
  
-                output.append(outputs[0])
-                label.append(labels[0])
+                output.append(outputs)
+                label.append(labels)
                 IDs[i] = ID[0]
             label = np.array(label)
             output = np.array(output)
             size_label=len(label)
-            output,label = output.reshape((size_label,1)), label.reshape((size_label,1))
+            output,label = output.reshape((size_label,6)), label.reshape((size_label,6))
             print(np.shape(label))
             for i in range(np.shape(label)[1]):
-                fig = plt.figure()
-                plt.plot(label[:,i],output[:,i],"o")
-                plt.plot(label[:,i],label[:,i])
-                plt.show()
-                writer.add_figure(str(epoch),fig)
+                fig,ax = plt.figure()
+                ax.plot(label[:,i],output[:,i],"o")
+                ax.plot(label[:,i],label[:,i])
+                writer.add_figure("Test/"+str(epoch)+str(i),fig)
             name_out = "./result" + str(epoch) + ".pkl"
             mse = test_loss/test_total
             
