@@ -34,11 +34,10 @@ class Datasets(Dataset):
             idx = idx.tolist()
         #img_name = os.path.join(self.image_dir, str(self.labels.iloc[idx,0]))
         with h5py.File(self.image_dir,"r") as file_h5:
-            key = sorted(file_h5.keys())
-            key = key[idx]
-            print(key)
-            im = file_h5[key].astype(np.float32)
-            print(im[:,:,2])
+            im = file_h5[str(idx)]#.astype(np.float32)
+            im = np.array(im).astype(np.float32)
+            if len(np.unique(im)) == 1:
+                print("\t There is an empty image")
             lab = self.scaler.transform(self.labels.iloc[:,1:])
             lab = pd.DataFrame(lab)
             lab.insert(0,"File name", self.labels.iloc[:,0], True)
