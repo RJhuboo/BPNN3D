@@ -71,7 +71,7 @@ class Trainer():
         
         # saving trained model
         check_name = "BPNN_checkpoint_" + str(epoch) + ".pth"
-        #torch.save(self.model.state_dict(),os.path.join(self.opt.checkpoint_path,check_name))
+        torch.save(self.model.state_dict(),os.path.join(self.opt.checkpoint_path,check_name))
         return mse
 
     def test(self,testloader,epoch,writer):
