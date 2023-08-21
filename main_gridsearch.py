@@ -112,6 +112,7 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
     running_loss = 0.0
     r2_s = 0
     mse_score = 0.0
+    Loss = MSELoss()
 
     for i, data in enumerate(trainloader):
         inputs, labels = data['image'].float(), data['label'].float()
@@ -123,7 +124,6 @@ def train(model,trainloader, optimizer, epoch , opt, steps_per_epochs=20):
         optimizer.zero_grad()
         # forward backward and optimization
         outputs = model(inputs)
-        Loss = MSELoss()
         loss = Loss(outputs,labels)
         
 
@@ -159,6 +159,7 @@ def test(model,testloader,epoch,opt):
     mse_score = 0.0
     output = {}
     label = {}
+    Loss = MSELoss()
     # Loading Checkpoint
     if opt['mode'] == "Test":
         check_name = "BPNN_checkpoint_" + str(epoch) + ".pth"
@@ -173,7 +174,6 @@ def test(model,testloader,epoch,opt):
             inputs, labels = inputs.to(device),labels.to(device)
             # loss
             outputs = model(inputs)
-            Loss = MSELoss()
             test_loss += Loss(outputs,labels)
             test_total += 1
             # statistics
@@ -194,32 +194,32 @@ def objective(trial):
     i=0
     while True:
         i += 1
-        if os.path.isdir("./result/cross_BPNN3D_theone"+str(i)) == False:
-            save_folder = "./result/cross_BPNN3D_theone"+str(i)
+        if os.path.isdir("./result/cross_BPNN3D_alone"+str(i)) == False:
+            save_folder = "./result/cross_BPNN3D_alone"+str(i)
             os.mkdir(save_folder)
             break
     # Create the folder where to save results and checkpoints
     opt = {'label_dir' : "/gpfsstore/rech/tvs/uki75tv/3D_label.csv",
            'image_dir' : "/gpfsstore/rech/tvs/uki75tv/output.h5",
            'train_cross' : "./cross_output.pkl",
-           'batch_size' : trial.suggest_int('batch_size',1,24,step=8),
-           #'batch_size':1,
+           #'batch_size' : trial.suggest_int('batch_size',1,24,step=8),
+           'batch_size':1,
            'model' : "ConvNet",
-           'nof' : trial.suggest_int('nof',10,50),
-           #'nof':20,
-           'lr': trial.suggest_loguniform('lr',1e-6,1e-4),
-           #'lr':0.00009,
+           #'nof' : trial.suggest_int('nof',10,50),
+           'nof':48,
+           #'lr': trial.suggest_loguniform('lr',1e-6,1e-4),
+           'lr':6.44e-06,
            'nb_epochs' : 200,
            'checkpoint_path' : "./",
            'mode': "Train",
            'cross_val' : False,
            'k_fold' : 1,
-           'n1' : trial.suggest_int('n1', 80,300),
-           'n2' : trial.suggest_int('n2',80,250),
-           'n3' : trial.suggest_int('n3',80,250),
-           #'n1':81,
-           #'n2':1798,
-           #'n3':748,
+           #'n1' : trial.suggest_int('n1', 80,300),
+           #'n2' : trial.suggest_int('n2',80,250),
+           #'n3' : trial.suggest_int('n3',80,250),
+           'n1':241,
+           'n2':111,
+           'n3':213,
            'nb_workers' : 8,
            #'norm_method': trial.suggest_categorical('norm_method',["standardization","minmax"]),
            'norm_method': "standardization",
@@ -284,5 +284,5 @@ else:
     print("running on cpu")
     
 study.optimize(objective,n_trials=10)
-with open("./Human_3D.pkl","wb") as f:
+with open("./Human_3D_alone.pkl","wb") as f:
     pickle.dump(study,f)
